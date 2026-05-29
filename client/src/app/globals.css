@@ -29,6 +29,9 @@ input, select, textarea, button {
   font-family: inherit;
 }
 
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }

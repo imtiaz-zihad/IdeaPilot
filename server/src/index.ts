@@ -11,6 +11,7 @@ import { notFound, globalErrorHandler } from "./middlewares/error.middleware";
 
 import passport from "passport";
 import "./config/passport";
+import validatorRoutes from "./routes/validator.routes";
 
 const app = express();
 
@@ -28,6 +29,8 @@ app.use(cookieParser());
 // Routes
 app.use("/api/auth",     authRoutes);
 app.use("/api/startups", startupRoutes);
+app.use("/api/startups", validatorRoutes); // mounts as /api/startups/:id/validate
+
 
 // Error handlers
 app.use(notFound);

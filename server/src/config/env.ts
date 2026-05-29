@@ -15,4 +15,5 @@ export const ENV = {
   GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID!,
   GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET!,
   OAUTH_CALLBACK_BASE: process.env.OAUTH_CALLBACK_BASE || "http://localhost:5000",
+  GEMINI_API_KEY: process.env.GEMINI_API_KEY!,
 };
