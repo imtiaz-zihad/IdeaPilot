@@ -21,6 +21,9 @@ export const useAuthStore = create<AuthStore>()(
     }),
     {
       name: "auth-store",
+      // ✅ Only persist user — NOT accessToken
+      // Token is refreshed automatically via httpOnly cookie
+      partialize: (state) => ({ user: state.user }),
     }
   )
 );

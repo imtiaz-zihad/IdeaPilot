@@ -16,7 +16,7 @@ export interface IValidationReport {
 export interface IAIReport extends Document {
   startupId: mongoose.Types.ObjectId;
   userId: mongoose.Types.ObjectId;
-  type: "validation" | "business_plan" | "market_research" | "financial" | "pitch";
+  type: "validation" | "business_plan" | "market_research" | "financial" | "pitch" | "branding";
   result: IValidationReport | Record<string, unknown>;
   rawPrompt: string;
   createdAt: Date;

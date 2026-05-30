@@ -8,6 +8,7 @@ const titles: Record<string, string> = {
   "/ai-chat": "AI Co-Founder", "/validator": "Idea Validator",
   "/market": "Market Research", "/financials": "Financials",
   "/pitch": "Pitch Deck", "/settings": "Settings",
+  "/branding": "Branding Assistant",
 };
 
 export default function Topbar() {

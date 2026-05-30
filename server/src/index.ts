@@ -12,6 +12,7 @@ import { notFound, globalErrorHandler } from "./middlewares/error.middleware";
 import passport from "passport";
 import "./config/passport";
 import validatorRoutes from "./routes/validator.routes";
+import brandingRoutes from "./routes/branding.routes";
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.use("/api/auth",     authRoutes);
 app.use("/api/startups", startupRoutes);
 app.use("/api/startups", validatorRoutes); // mounts as /api/startups/:id/validate
 
+app.use("/api/startups", brandingRoutes);
 
 // Error handlers
 app.use(notFound);

@@ -11,6 +11,7 @@ const navItems = [
   { label: "Market Research",href: "/market",       icon: "📊" },
   { label: "Financials",     href: "/financials",   icon: "💰" },
   { label: "Pitch Deck",     href: "/pitch",        icon: "🖥️" },
+  { label: "Branding",      href: "/branding",     icon: "🎨" },
   { label: "Settings",       href: "/settings",     icon: "⚙️" },
 ];
 
