@@ -26,7 +26,11 @@ const aiReportSchema = new Schema<IAIReport>(
   {
     startupId: { type: Schema.Types.ObjectId, ref: "Startup", required: true },
     userId:    { type: Schema.Types.ObjectId, ref: "User",    required: true },
-    type:      { type: String, enum: ["validation","business_plan","market_research","financial","pitch"], required: true },
+    type: {
+      type: String,
+      enum: ["validation", "business_plan", "market_research", "financial", "pitch", "branding"],
+      required: true,
+    },
     result:    { type: Schema.Types.Mixed, required: true },
     rawPrompt: { type: String },
   },

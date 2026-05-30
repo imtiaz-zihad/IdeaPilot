@@ -13,6 +13,7 @@ import passport from "passport";
 import "./config/passport";
 import validatorRoutes from "./routes/validator.routes";
 import brandingRoutes from "./routes/branding.routes";
+import pitchDeckRoutes from "./routes/pitchdeck.routes";
 
 const app = express();
 
@@ -31,8 +32,8 @@ app.use(cookieParser());
 app.use("/api/auth",     authRoutes);
 app.use("/api/startups", startupRoutes);
 app.use("/api/startups", validatorRoutes); // mounts as /api/startups/:id/validate
-
 app.use("/api/startups", brandingRoutes);
+app.use("/api/startups", pitchDeckRoutes);
 
 // Error handlers
 app.use(notFound);
