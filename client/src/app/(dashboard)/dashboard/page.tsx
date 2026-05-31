@@ -1,74 +1,99 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 import api from "@/lib/api";
 import { Startup } from "@/types";
 
+const scoreColor = (s: number) =>
+  s >= 75 ? "text-success" : s >= 50 ? "text-warning" : "text-danger";
+
+const industryEmoji: Record<string, string> = {
+  "Food Tech":"🍔","HealthTech":"💊","EdTech":"📚","FinTech":"💳",
+  "SaaS":"☁️","E-Commerce":"🛒","AI / ML":"🤖","CleanTech":"🌱","LogisticsTech":"📦",
+};
+
 export default function DashboardPage() {
-  const { user } = useAuthStore();
+  const { user }    = useAuthStore();
+  const router      = useRouter();
   const [startups, setStartups] = useState<Startup[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading,  setLoading]  = useState(true);
 
   useEffect(() => {
-    api.get("/startups").then(({ data }) => {
-      setStartups(data.data);
-    }).catch(() => {}).finally(() => setLoading(false));
+    api.get("/startups").then(({ data }) => setStartups(data.data))
+      .finally(() => setLoading(false));
   }, []);
 
-  const statCards = [
-    { label: "Active Startups", value: startups.length, delta: "↑ ready to scale", color: "var(--accent)" },
-    { label: "AI Reports", value: startups.length * 4, delta: "↑ auto-generated", color: "var(--green)" },
-    { label: "Avg Investor Score", value: startups.length ? Math.round(startups.reduce((a, s) => a + (s.investorScore || 70), 0) / startups.length) : 0, delta: "↑ improving", color: "var(--amber)" },
-    { label: "AI Tokens Used", value: "142k", delta: "of 500k monthly", color: "var(--blue)" },
+  const avgScore = startups.length
+    ? Math.round(startups.reduce((a, s) => a + (s.investorScore || 0), 0) / startups.length)
+    : 0;
+
+  const stats = [
+    { label: "Active Startups",    value: startups.length, delta: "in your workspace",   color: "text-accent" },
+    { label: "AI Reports",         value: startups.length * 4, delta: "auto-generated",  color: "text-success" },
+    { label: "Avg Investor Score", value: avgScore || "—",  delta: "across all startups", color: "text-warning" },
+    { label: "AI Tokens Used",     value: "142k",           delta: "of 500k monthly",    color: "text-info" },
   ];
 
   return (
-    <div>
-      <p style={{ color: "var(--text2)", fontSize: 14, marginBottom: 24 }}>
-        Welcome back, <strong style={{ color: "var(--text)" }}>{user?.name}</strong> 👋
+    <div className="max-w-5xl mx-auto">
+      <p className="text-text2 text-md mb-6">
+        Welcome back, <strong className="text-text">{user?.name}</strong> 👋
       </p>
 
-      {/* Stat cards */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 14, marginBottom: 24 }}>
-        {statCards.map(s => (
-          <div key={s.label} style={{ background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: 14, padding: "18px 20px" }}>
-            <div style={{ fontSize: 12, color: "var(--text2)", marginBottom: 8 }}>{s.label}</div>
-            <div style={{ fontSize: 26, fontWeight: 700, color: s.color, marginBottom: 4 }}>{s.value}</div>
-            <div style={{ fontSize: 12, color: "var(--text3)" }}>{s.delta}</div>
+      {/* Stats */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 mb-6">
+        {stats.map(s => (
+          <div key={s.label} className="card">
+            <div className="text-sm text-text2 mb-2">{s.label}</div>
+            <div className={`text-5xl font-bold font-head mb-1 ${s.color}`}>{s.value}</div>
+            <div className="text-xs text-text3">{s.delta}</div>
           </div>
         ))}
       </div>
 
       {/* Startups */}
-      <div style={{ background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: 14, padding: 20 }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-          <span style={{ fontSize: 15, fontWeight: 600 }}>My Startups</span>
+      <div className="card">
+        <div className="flex items-center justify-between mb-4">
+          <span className="text-lg font-semibold">My Startups</span>
+          <button onClick={() => router.push("/startups")} className="text-sm text-accent hover:underline bg-none border-none cursor-pointer">
+            See all →
+          </button>
         </div>
+
         {loading ? (
-          <p style={{ color: "var(--text3)", fontSize: 13 }}>Loading...</p>
+          <div className="flex flex-col gap-3">
+            {[1,2,3].map(i => <div key={i} className="skeleton h-14" />)}
+          </div>
         ) : startups.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "40px 0", color: "var(--text3)" }}>
-            <div style={{ fontSize: 36, marginBottom: 12 }}>🚀</div>
-            <p style={{ fontSize: 14, marginBottom: 6 }}>No startups yet</p>
-            <p style={{ fontSize: 13 }}>Click New Startup to create your first AI-powered startup workspace.</p>
+          <div className="text-center py-10">
+            <div className="text-5xl mb-3">🚀</div>
+            <p className="text-text2 text-base">No startups yet — click &quot;New Startup&quot; to begin.</p>
           </div>
         ) : (
-          startups.map(s => (
-            <div key={s._id} style={{ display: "flex", alignItems: "center", gap: 14, padding: "12px 0", borderBottom: "1px solid var(--border)" }}>
-              <div style={{ width: 38, height: 38, borderRadius: 10, background: "var(--accent-glow, #6c63ff20)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>🚀</div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 500, fontSize: 14 }}>{s.startupName}</div>
-                <div style={{ fontSize: 12, color: "var(--text2)" }}>{s.industry} · {s.country}</div>
-                <div style={{ height: 4, background: "var(--bg4)", borderRadius: 2, marginTop: 6, overflow: "hidden" }}>
-                  <div style={{ height: "100%", width: `${s.investorScore || 70}%`, background: "var(--accent)", borderRadius: 2 }} />
+          <div className="flex flex-col divide-y divide-border">
+            {startups.slice(0, 5).map(s => (
+              <div key={s._id} onClick={() => router.push(`/startups/${s._id}`)}
+                className="flex items-center gap-3.5 py-3 cursor-pointer hover:bg-bg3/50 -mx-5 px-5 transition-colors">
+                <div className="w-10 h-10 rounded-xl bg-bg3 flex items-center justify-center text-xl flex-shrink-0">
+                  {industryEmoji[s.industry] || "💡"}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="font-medium text-md truncate">{s.startupName}</div>
+                  <div className="text-sm text-text2">{s.industry} · {s.country}</div>
+                  <div className="h-1 bg-bg4 rounded mt-1.5 overflow-hidden w-32">
+                    <div className="h-full bg-accent rounded" style={{ width: `${s.investorScore || 0}%` }} />
+                  </div>
+                </div>
+                <div className="text-right flex-shrink-0">
+                  <div className={`text-3xl font-bold font-head ${s.investorScore ? scoreColor(s.investorScore) : "text-text3"}`}>
+                    {s.investorScore || "—"}
+                  </div>
+                  <div className="text-xs text-text3">/100</div>
                 </div>
               </div>
-              <div style={{ textAlign: "right" }}>
-                <div style={{ fontSize: 20, fontWeight: 700, color: "var(--accent)" }}>{s.investorScore || "—"}</div>
-                <div style={{ fontSize: 10, color: "var(--text3)" }}>/100</div>
-              </div>
-            </div>
-          ))
+            ))}
+          </div>
         )}
       </div>
     </div>

@@ -3,48 +3,35 @@ import { useEffect, useState } from "react";
 import api from "@/lib/api";
 import { Startup } from "@/types";
 
-interface BrandName {
-  name: string;
-  reasoning: string;
-  domain: string;
-  score: number;
-}
-interface Slogan { text: string; tone: string; }
-interface ColorPalette {
-  primary: string; secondary: string;
-  accent: string; background: string;
-  name: string; mood: string;
-}
-interface Typography { heading: string; body: string; reasoning: string; }
+interface BrandName   { name: string; reasoning: string; domain: string; score: number; }
+interface Slogan      { text: string; tone: string; }
+interface ColorPalette { primary: string; secondary: string; accent: string; background: string; name: string; mood: string; }
+interface Typography  { heading: string; body: string; reasoning: string; }
 interface LogoConcept { style: string; icon: string; description: string; }
 interface BrandingResult {
-  brandNames: BrandName[];
-  slogans: Slogan[];
-  colorPalette: ColorPalette;
-  typography: Typography;
+  brandNames: BrandName[]; slogans: Slogan[];
+  colorPalette: ColorPalette; typography: Typography;
   logoConcepts: LogoConcept[];
-  brandPersonality: string[];
-  targetTone: string;
-  brandStory: string;
+  brandPersonality: string[]; targetTone: string; brandStory: string;
 }
 
 const toneColor: Record<string, string> = {
-  Professional: "var(--blue)",
-  Playful:      "var(--amber)",
-  Bold:         "var(--red)",
-  Inspirational:"var(--accent)",
-  Minimal:      "var(--text2)",
+  Professional:"text-info bg-info/10 border-info/20",
+  Playful:"text-warning bg-warning/10 border-warning/20",
+  Bold:"text-danger bg-danger/10 border-danger/20",
+  Inspirational:"text-accent bg-accent/10 border-accent/20",
+  Minimal:"text-text2 bg-bg3 border-border",
 };
 
 export default function BrandingPage() {
-  const [startups,  setStartups]  = useState<Startup[]>([]);
-  const [selected,  setSelected]  = useState("");
-  const [result,    setResult]    = useState<BrandingResult | null>(null);
-  const [loading,   setLoading]   = useState(false);
-  const [fetching,  setFetching]  = useState(true);
-  const [cached,    setCached]    = useState(false);
-  const [error,     setError]     = useState("");
-  const [copied,    setCopied]    = useState("");
+  const [startups, setStartups] = useState<Startup[]>([]);
+  const [selected, setSelected] = useState("");
+  const [result,   setResult]   = useState<BrandingResult | null>(null);
+  const [loading,  setLoading]  = useState(false);
+  const [fetching, setFetching] = useState(true);
+  const [cached,   setCached]   = useState(false);
+  const [error,    setError]    = useState("");
+  const [copied,   setCopied]   = useState("");
 
   useEffect(() => {
     api.get("/startups").then(({ data }) => {
@@ -55,100 +42,82 @@ export default function BrandingPage() {
 
   const handleGenerate = async (regen = false) => {
     if (!selected) return;
-    setLoading(true);
-    setError("");
-    setResult(null);
+    setLoading(true); setError(""); setResult(null);
     try {
-      const url = regen
-        ? `/startups/${selected}/branding/regenerate`
-        : `/startups/${selected}/branding`;
-      const { data } = await api.post(url);
+      const { data } = await api.post(`/startups/${selected}/branding${regen ? "/regenerate" : ""}`);
       setResult(data.data.report.result);
       setCached(data.data.cached ?? false);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
-      setError(err.response?.data?.message || "Generation failed. Try again.");
-    } finally {
-      setLoading(false);
-    }
+      setError(err.response?.data?.message || "Generation failed.");
+    } finally { setLoading(false); }
   };
 
-  const copyToClipboard = (text: string, key: string) => {
+  const copy = (text: string, key: string) => {
     navigator.clipboard.writeText(text);
     setCopied(key);
     setTimeout(() => setCopied(""), 2000);
   };
 
   return (
-    <div style={{ maxWidth: 960, margin: "0 auto" }}>
-      {/* Header */}
-      <div style={{ marginBottom: 28 }}>
-        <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 6 }}>🎨 Branding Assistant</h1>
-        <p style={{ color: "var(--text2)", fontSize: 14 }}>
-          AI generates brand names, slogans, color palette, typography and logo concepts for your startup.
-        </p>
+    <div className="max-w-4xl mx-auto">
+      <div className="mb-7">
+        <h1 className="text-[22px] font-bold font-head mb-1.5">🎨 Branding Assistant</h1>
+        <p className="text-text2 text-[13px]">AI generates brand names, slogans, color palette, typography and logo concepts.</p>
       </div>
 
       {/* Controls */}
-      <div style={{ background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: 14, padding: 20, marginBottom: 24 }}>
-        <div style={{ display: "flex", gap: 12, alignItems: "flex-end", flexWrap: "wrap" }}>
-          <div style={{ flex: 1, minWidth: 200 }}>
-            <label style={labelStyle}>Select startup</label>
-            {fetching ? (
-              <div style={inputStyle}>Loading...</div>
-            ) : startups.length === 0 ? (
-              <div style={{ ...inputStyle, color: "var(--text3)" }}>No startups — create one first</div>
-            ) : (
-              <select style={inputStyle} value={selected}
-                onChange={e => { setSelected(e.target.value); setResult(null); }}>
-                {startups.map(s => (
-                  <option key={s._id} value={s._id}>{s.startupName} — {s.industry}</option>
-                ))}
-              </select>
-            )}
+      <div className="card mb-6">
+        <div className="flex gap-3 items-end flex-wrap">
+          <div className="flex-1 min-w-[200px]">
+            <label className="label">Select startup</label>
+            {fetching ? <div className="input text-text3">Loading...</div>
+              : startups.length === 0 ? <div className="input text-text3">No startups yet</div>
+              : (
+                <select className="input" value={selected}
+                  onChange={e => { setSelected(e.target.value); setResult(null); }}>
+                  {startups.map(s => <option key={s._id} value={s._id}>{s.startupName} — {s.industry}</option>)}
+                </select>
+              )}
           </div>
-          <button onClick={() => handleGenerate(false)} disabled={loading || !selected} style={primaryBtn}>
-            {loading ? <><Spinner /> Generating...</> : "✦ Generate Branding"}
+          <button onClick={() => handleGenerate(false)} disabled={loading || !selected} className="btn-primary">
+            {loading ? <><span className="spinner w-3.5 h-3.5" /> Generating...</> : "✦ Generate Branding"}
           </button>
-          {result && (
-            <button onClick={() => handleGenerate(true)} disabled={loading} style={ghostBtn}>
-              ↺ Regenerate
-            </button>
-          )}
+          {result && <button onClick={() => handleGenerate(true)} disabled={loading} className="btn-ghost">↺ Regenerate</button>}
         </div>
-        {error && <p style={{ color: "var(--red)", fontSize: 13, marginTop: 12 }}>{error}</p>}
+        {error && <p className="text-danger text-[13px] mt-3">{error}</p>}
       </div>
 
       {/* Loading */}
       {loading && (
-        <div style={{ background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: 14, padding: 56, textAlign: "center" }}>
-          <div style={spinnerStyle} />
-          <p style={{ color: "var(--text2)", fontSize: 14, marginTop: 16 }}>Building your brand identity...</p>
-          <p style={{ color: "var(--text3)", fontSize: 12, marginTop: 6 }}>Gemini is crafting names, colors, and concepts</p>
+        <div className="card py-14 text-center">
+          <div className="spinner-lg w-10 h-10 mb-4" />
+          <p className="text-text2 text-[14px]">Building your brand identity...</p>
+          <p className="text-text3 text-[12px] mt-1.5">Gemini is crafting names, colors, and concepts</p>
         </div>
       )}
 
       {/* Results */}
       {!loading && result && (
-        <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+        <div className="flex flex-col gap-4">
 
-          {/* Brand Story + Personality */}
-          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 14 }}>
-            <div style={card}>
-              <SectionTitle>📖 Brand Story</SectionTitle>
-              <p style={{ fontSize: 14, color: "var(--text2)", lineHeight: 1.8 }}>{result.brandStory}</p>
-              <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px solid var(--border)" }}>
-                <div style={{ fontSize: 12, color: "var(--text3)", marginBottom: 6 }}>Voice & Tone</div>
-                <p style={{ fontSize: 13, color: "var(--text)" }}>{result.targetTone}</p>
+          {/* Story + Personality */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div className="card lg:col-span-2">
+              <div className="text-[14px] font-semibold mb-3">📖 Brand Story</div>
+              <p className="text-[14px] text-text2 leading-relaxed">{result.brandStory}</p>
+              <div className="mt-4 pt-4 border-t border-border">
+                <div className="text-[11px] text-text3 mb-1.5">Voice & Tone</div>
+                <p className="text-[13px]">{result.targetTone}</p>
               </div>
             </div>
-            <div style={card}>
-              <SectionTitle>⚡ Brand Personality</SectionTitle>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 4 }}>
+            <div className="card">
+              <div className="text-[14px] font-semibold mb-3">⚡ Brand Personality</div>
+              <div className="flex flex-col gap-2">
                 {(result.brandPersonality || []).map((trait, i) => (
-                  <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", background: "var(--bg3)", borderRadius: 8 }}>
-                    <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--accent)", flexShrink: 0 }} />
-                    <span style={{ fontSize: 13, fontWeight: 500 }}>{trait}</span>
+                  <div key={i} className="flex items-center gap-2.5 px-3 py-2 bg-bg3 rounded-[8px]">
+                    <span className="w-1.5 h-1.5 rounded-full bg-accent flex-shrink-0" />
+                    <span className="text-[13px] font-medium">{trait}</span>
                   </div>
                 ))}
               </div>
@@ -156,37 +125,27 @@ export default function BrandingPage() {
           </div>
 
           {/* Brand Names */}
-          <div style={card}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-              <SectionTitle>✏️ Brand Names</SectionTitle>
-              {cached && <span style={cachedBadge}>cached</span>}
+          <div className="card">
+            <div className="flex items-center justify-between mb-4">
+              <div className="text-[14px] font-semibold">✏️ Brand Names</div>
+              {cached && <span className="text-[11px] text-text3 px-2 py-0.5 border border-border rounded-[8px]">cached</span>}
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 12 }}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {(result.brandNames || []).map((b, i) => (
-                <div key={i} style={{
-                  background: "var(--bg3)", border: "1px solid var(--border)",
-                  borderRadius: 12, padding: 16, position: "relative",
-                  borderLeft: i === 0 ? "3px solid var(--accent)" : "1px solid var(--border)",
-                }}>
-                  {i === 0 && (
-                    <span style={{ position: "absolute", top: 10, right: 10, fontSize: 10, padding: "2px 7px", borderRadius: 8, background: "var(--accent)", color: "#fff" }}>
-                      Top Pick
-                    </span>
-                  )}
-                  <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 4, color: i === 0 ? "var(--accent)" : "var(--text)" }}>
-                    {b.name}
-                  </div>
-                  <div style={{ fontSize: 11, color: "var(--text3)", marginBottom: 8 }}>{b.domain}</div>
-                  <p style={{ fontSize: 12, color: "var(--text2)", lineHeight: 1.5, marginBottom: 10 }}>{b.reasoning}</p>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                      <div style={{ width: 60, height: 4, background: "var(--bg4)", borderRadius: 2, overflow: "hidden" }}>
-                        <div style={{ height: "100%", width: `${b.score}%`, background: b.score >= 75 ? "var(--green)" : b.score >= 50 ? "var(--amber)" : "var(--red)", borderRadius: 2 }} />
+                <div key={i} className={`bg-bg3 rounded-[12px] p-4 relative border ${i === 0 ? "border-l-4 border-accent" : "border-border"}`}>
+                  {i === 0 && <span className="absolute top-2.5 right-2.5 text-[10px] px-2 py-0.5 rounded-[6px] bg-accent text-white">Top Pick</span>}
+                  <div className={`text-[18px] font-bold mb-1 ${i === 0 ? "text-accent" : "text-text"}`}>{b.name}</div>
+                  <div className="text-[11px] text-text3 mb-2">{b.domain}</div>
+                  <p className="text-[12px] text-text2 leading-relaxed mb-3">{b.reasoning}</p>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-14 h-1 bg-bg4 rounded-full overflow-hidden">
+                        <div className="h-full rounded-full" style={{ width: `${b.score}%`, background: b.score >= 75 ? "var(--green)" : b.score >= 50 ? "var(--amber)" : "var(--red)" }} />
                       </div>
-                      <span style={{ fontSize: 11, color: "var(--text3)" }}>{b.score}/100</span>
+                      <span className="text-[11px] text-text3">{b.score}/100</span>
                     </div>
-                    <button onClick={() => copyToClipboard(b.name, `name-${i}`)}
-                      style={{ background: "none", border: "none", color: copied === `name-${i}` ? "var(--green)" : "var(--text3)", cursor: "pointer", fontSize: 12 }}>
+                    <button onClick={() => copy(b.name, `name-${i}`)}
+                      className={`text-[12px] bg-transparent border-none cursor-pointer ${copied === `name-${i}` ? "text-success" : "text-text3 hover:text-text2"}`}>
                       {copied === `name-${i}` ? "✓ copied" : "copy"}
                     </button>
                   </div>
@@ -196,150 +155,98 @@ export default function BrandingPage() {
           </div>
 
           {/* Slogans */}
-          <div style={card}>
-            <SectionTitle>💬 Slogans</SectionTitle>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 4 }}>
+          <div className="card">
+            <div className="text-[14px] font-semibold mb-3">💬 Slogans</div>
+            <div className="flex flex-col gap-2.5">
               {(result.slogans || []).map((s, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", background: "var(--bg3)", borderRadius: 10, gap: 12 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 12, flex: 1 }}>
-                    <span style={{ fontSize: 11, padding: "2px 8px", borderRadius: 8, background: `${toneColor[s.tone] || "var(--accent)"}18`, color: toneColor[s.tone] || "var(--accent)", border: `1px solid ${toneColor[s.tone] || "var(--accent)"}30`, flexShrink: 0 }}>
-                      {s.tone}
-                    </span>
-                    <span style={{ fontSize: 14, fontStyle: "italic", color: "var(--text)" }}>&quot;{s.text}&quot;</span>
+                <div key={i} className="flex items-center justify-between gap-3 px-4 py-3 bg-bg3 rounded-[10px]">
+                  <div className="flex items-center gap-3 flex-1">
+                    <span className={`badge border flex-shrink-0 ${toneColor[s.tone] || "text-accent bg-accent/10 border-accent/20"}`}>{s.tone}</span>
+                    <span className="text-[14px] italic">&quot;{s.text}&quot;</span>
                   </div>
-                  <button onClick={() => copyToClipboard(s.text, `slogan-${i}`)}
-                    style={{ background: "none", border: "none", color: copied === `slogan-${i}` ? "var(--green)" : "var(--text3)", cursor: "pointer", fontSize: 12, flexShrink: 0 }}>
-                    {copied === `slogan-${i}` ? "✓ copied" : "copy"}
+                  <button onClick={() => copy(s.text, `slogan-${i}`)}
+                    className={`text-[12px] bg-transparent border-none cursor-pointer flex-shrink-0 ${copied === `slogan-${i}` ? "text-success" : "text-text3 hover:text-text2"}`}>
+                    {copied === `slogan-${i}` ? "✓" : "copy"}
                   </button>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Color Palette + Typography */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-
-            {/* Color Palette */}
-            <div style={card}>
-              <SectionTitle>🎨 Color Palette</SectionTitle>
-              <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 4, marginTop: 8 }}>{result.colorPalette?.name}</div>
-              <p style={{ fontSize: 12, color: "var(--text2)", marginBottom: 14, lineHeight: 1.5 }}>{result.colorPalette?.mood}</p>
-              <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
+          {/* Palette + Typography */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {/* Palette */}
+            <div className="card">
+              <div className="text-[14px] font-semibold mb-3">🎨 Color Palette</div>
+              <div className="font-semibold text-[13px] mb-1">{result.colorPalette?.name}</div>
+              <p className="text-[12px] text-text2 mb-4 leading-relaxed">{result.colorPalette?.mood}</p>
+              <div className="flex gap-2 mb-4">
                 {[
-                  { label: "Primary",    hex: result.colorPalette?.primary },
-                  { label: "Secondary",  hex: result.colorPalette?.secondary },
-                  { label: "Accent",     hex: result.colorPalette?.accent },
-                  { label: "Background", hex: result.colorPalette?.background },
+                  { label:"Primary",    hex:result.colorPalette?.primary },
+                  { label:"Secondary",  hex:result.colorPalette?.secondary },
+                  { label:"Accent",     hex:result.colorPalette?.accent },
+                  { label:"Background", hex:result.colorPalette?.background },
                 ].map(c => (
-                  <div key={c.label} style={{ flex: 1, cursor: "pointer" }} onClick={() => copyToClipboard(c.hex, c.label)}>
-                    <div style={{ height: 56, borderRadius: 10, background: c.hex, marginBottom: 6, border: "1px solid var(--border)", position: "relative" }}>
+                  <div key={c.label} className="flex-1 cursor-pointer" onClick={() => copy(c.hex, c.label)}>
+                    <div className="h-14 rounded-[10px] border border-border mb-1.5 relative overflow-hidden" style={{ background: c.hex }}>
                       {copied === c.label && (
-                        <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "#00000050", borderRadius: 10, fontSize: 12, color: "#fff" }}>✓</div>
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/40 text-white text-[12px]">✓</div>
                       )}
                     </div>
-                    <div style={{ fontSize: 10, color: "var(--text3)", textAlign: "center" }}>{c.label}</div>
-                    <div style={{ fontSize: 10, color: "var(--text2)", textAlign: "center", fontFamily: "monospace" }}>{c.hex}</div>
+                    <div className="text-[10px] text-text3 text-center">{c.label}</div>
+                    <div className="text-[10px] text-text2 text-center font-mono">{c.hex}</div>
                   </div>
                 ))}
               </div>
-              {/* Preview bar */}
-              <div style={{ height: 10, borderRadius: 5, overflow: "hidden", display: "flex" }}>
-                {[result.colorPalette?.primary, result.colorPalette?.secondary, result.colorPalette?.accent, result.colorPalette?.background].map((c, i) => (
-                  <div key={i} style={{ flex: 1, background: c }} />
-                ))}
+              <div className="h-2.5 rounded-full overflow-hidden flex">
+                {[result.colorPalette?.primary, result.colorPalette?.secondary, result.colorPalette?.accent, result.colorPalette?.background]
+                  .map((c, i) => <div key={i} className="flex-1" style={{ background: c }} />)}
               </div>
             </div>
 
             {/* Typography */}
-            <div style={card}>
-              <SectionTitle>🔤 Typography</SectionTitle>
-              <div style={{ display: "flex", flexDirection: "column", gap: 14, marginTop: 8 }}>
-                <div style={{ background: "var(--bg3)", borderRadius: 10, padding: 16 }}>
-                  <div style={{ fontSize: 11, color: "var(--text3)", marginBottom: 6 }}>HEADING FONT</div>
-                  <div style={{ fontSize: 22, fontWeight: 700, marginBottom: 4 }}>{result.typography?.heading}</div>
-                  <div style={{ fontSize: 11, color: "var(--text3)" }}>The quick brown fox jumps over the lazy dog</div>
+            <div className="card">
+              <div className="text-[14px] font-semibold mb-3">🔤 Typography</div>
+              <div className="flex flex-col gap-3">
+                <div className="bg-bg3 rounded-[10px] p-4">
+                  <div className="text-[11px] text-text3 mb-1.5 uppercase tracking-wider">Heading Font</div>
+                  <div className="text-[22px] font-bold mb-1">{result.typography?.heading}</div>
+                  <div className="text-[11px] text-text3">The quick brown fox jumps over the lazy dog</div>
                 </div>
-                <div style={{ background: "var(--bg3)", borderRadius: 10, padding: 16 }}>
-                  <div style={{ fontSize: 11, color: "var(--text3)", marginBottom: 6 }}>BODY FONT</div>
-                  <div style={{ fontSize: 15, marginBottom: 4 }}>{result.typography?.body}</div>
-                  <div style={{ fontSize: 11, color: "var(--text3)" }}>The quick brown fox jumps over the lazy dog</div>
+                <div className="bg-bg3 rounded-[10px] p-4">
+                  <div className="text-[11px] text-text3 mb-1.5 uppercase tracking-wider">Body Font</div>
+                  <div className="text-[15px] mb-1">{result.typography?.body}</div>
+                  <div className="text-[11px] text-text3">The quick brown fox jumps over the lazy dog</div>
                 </div>
-                <p style={{ fontSize: 12, color: "var(--text2)", lineHeight: 1.6 }}>{result.typography?.reasoning}</p>
+                <p className="text-[12px] text-text2 leading-relaxed">{result.typography?.reasoning}</p>
               </div>
             </div>
           </div>
 
           {/* Logo Concepts */}
-          <div style={card}>
-            <SectionTitle>🖼️ Logo Concepts</SectionTitle>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 12, marginTop: 4 }}>
+          <div className="card">
+            <div className="text-[14px] font-semibold mb-4">🖼️ Logo Concepts</div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {(result.logoConcepts || []).map((l, i) => (
-                <div key={i} style={{ background: "var(--bg3)", border: "1px solid var(--border)", borderRadius: 12, padding: 20, textAlign: "center" }}>
-                  <div style={{ fontSize: 52, marginBottom: 12 }}>{l.icon}</div>
-                  <div style={{ display: "inline-block", padding: "2px 10px", borderRadius: 8, background: "var(--accent)18", color: "var(--accent)", fontSize: 11, fontWeight: 500, marginBottom: 10 }}>
-                    {l.style}
-                  </div>
-                  <p style={{ fontSize: 12, color: "var(--text2)", lineHeight: 1.6 }}>{l.description}</p>
+                <div key={i} className="bg-bg3 border border-border rounded-[12px] p-5 text-center">
+                  <div className="text-[52px] mb-3">{l.icon}</div>
+                  <span className="badge-accent text-[11px] mb-3 inline-block">{l.style}</span>
+                  <p className="text-[12px] text-text2 leading-relaxed mt-2">{l.description}</p>
                 </div>
               ))}
             </div>
           </div>
-
         </div>
       )}
 
-      {/* Empty state */}
+      {/* Empty */}
       {!loading && !result && !error && (
-        <div style={{ background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: 14, padding: 56, textAlign: "center" }}>
-          <div style={{ fontSize: 52, marginBottom: 14 }}>🎨</div>
-          <p style={{ fontSize: 15, fontWeight: 600, marginBottom: 8 }}>Ready to build your brand?</p>
-          <p style={{ fontSize: 13, color: "var(--text2)" }}>Select a startup and click Generate — AI will craft your full brand identity in seconds.</p>
+        <div className="card py-14 text-center">
+          <div className="text-[52px] mb-4">🎨</div>
+          <p className="text-[15px] font-semibold mb-2">Ready to build your brand?</p>
+          <p className="text-text2 text-[13px]">Select a startup and click Generate — AI will craft your full brand identity.</p>
         </div>
       )}
     </div>
   );
 }
-
-// ── Sub-components ────────────────────────────────────────
-
-function SectionTitle({ children }: { children: React.ReactNode }) {
-  return <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 12 }}>{children}</div>;
-}
-
-function Spinner() {
-  return <span style={{ width: 13, height: 13, border: "2px solid #fff4", borderTopColor: "#fff", borderRadius: "50%", display: "inline-block", animation: "spin .7s linear infinite" }} />;
-}
-
-// ── Styles ────────────────────────────────────────────────
-
-const card: React.CSSProperties = {
-  background: "var(--bg2)", border: "1px solid var(--border)",
-  borderRadius: 14, padding: 20,
-};
-const labelStyle: React.CSSProperties = {
-  display: "block", fontSize: 12, color: "var(--text2)", marginBottom: 6,
-};
-const inputStyle: React.CSSProperties = {
-  width: "100%", background: "var(--bg3)", border: "1px solid var(--border)",
-  borderRadius: 10, padding: "9px 12px", fontSize: 13, color: "var(--text)", outline: "none",
-};
-const primaryBtn: React.CSSProperties = {
-  display: "inline-flex", alignItems: "center", gap: 8,
-  padding: "9px 20px", borderRadius: 10, background: "var(--accent)",
-  border: "none", color: "#fff", fontSize: 13, fontWeight: 500,
-  cursor: "pointer", flexShrink: 0,
-};
-const ghostBtn: React.CSSProperties = {
-  padding: "9px 16px", borderRadius: 10, background: "none",
-  border: "1px solid var(--border2)", color: "var(--text2)",
-  fontSize: 13, cursor: "pointer", flexShrink: 0,
-};
-const spinnerStyle: React.CSSProperties = {
-  width: 40, height: 40, border: "3px solid var(--bg4)",
-  borderTopColor: "var(--accent)", borderRadius: "50%",
-  animation: "spin .8s linear infinite", margin: "0 auto",
-};
-const cachedBadge: React.CSSProperties = {
-  fontSize: 11, color: "var(--text3)", padding: "2px 8px",
-  border: "1px solid var(--border)", borderRadius: 10,
-};

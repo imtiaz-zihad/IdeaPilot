@@ -3,21 +3,36 @@ import { usePathname, useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 import api from "@/lib/api";
 
-const navItems = [
-  { label: "Dashboard",      href: "/dashboard",    icon: "⊞" },
-  { label: "My Startups",    href: "/startups",     icon: "🚀" },
-  { label: "AI Co-Founder",  href: "/ai-chat",      icon: "💬" },
-  { label: "Idea Validator", href: "/validator",    icon: "🎯" },
-  { label: "Market Research",href: "/market",       icon: "📊" },
-  { label: "Financials",     href: "/financials",   icon: "💰" },
-  { label: "Pitch Deck",     href: "/pitch",        icon: "🖥️" },
-  { label: "Branding",      href: "/branding",     icon: "🎨" },
-  { label: "Settings",       href: "/settings",     icon: "⚙️" },
+const navSections = [
+  {
+    label: "Workspace",
+    items: [
+      { label: "Dashboard",     href: "/dashboard",  icon: "⊞" },
+      { label: "My Startups",   href: "/startups",   icon: "🚀" },
+      { label: "AI Co-Founder", href: "/ai-chat",    icon: "💬" },
+    ],
+  },
+  {
+    label: "Tools",
+    items: [
+      { label: "Idea Validator",  href: "/validator",  icon: "🎯" },
+      { label: "Market Research", href: "/market",     icon: "📊" },
+      { label: "Financials",      href: "/financials", icon: "💰" },
+      { label: "Branding",        href: "/branding",   icon: "🎨" },
+      { label: "Pitch Deck",      href: "/pitch",      icon: "🖥️" },
+    ],
+  },
+  {
+    label: "Account",
+    items: [
+      { label: "Settings", href: "/settings", icon: "⚙️" },
+    ],
+  },
 ];
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const router = useRouter();
+  const router   = useRouter();
   const { user, logout } = useAuthStore();
 
   const handleLogout = async () => {
@@ -29,56 +44,48 @@ export default function Sidebar() {
   const initials = user?.name?.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "U";
 
   return (
-    <aside style={{ width: 220, minHeight: "100vh", background: "var(--bg2)", borderRight: "1px solid var(--border)", display: "flex", flexDirection: "column", flexShrink: 0 }}>
+    <aside className="w-[220px] min-h-screen bg-bg2 border-r border-border flex flex-col flex-shrink-0">
       {/* Logo */}
-      <div style={{ padding: "20px 20px 16px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", gap: 10 }}>
-        <div style={{ width: 30, height: 30, background: "var(--accent)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 13, color: "#fff" }}>AI</div>
-        <span style={{ fontWeight: 700, fontSize: 15 }}>Co<span style={{ color: "var(--accent)" }}>Founder</span></span>
+      <div className="px-5 py-[18px] border-b border-border flex items-center gap-2.5">
+        <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center font-bold text-sm text-white font-head">AI</div>
+        <span className="font-bold text-xl font-head">Co<span className="text-accent">Founder</span></span>
       </div>
 
       {/* Nav */}
-      <nav style={{ padding: "12px 10px", flex: 1 }}>
-        <div style={{ fontSize: 10, letterSpacing: "0.08em", color: "var(--text3)", padding: "10px 10px 6px", textTransform: "uppercase" }}>Workspace</div>
-        {navItems.slice(0, 3).map(item => (
-          <NavItem key={item.href} item={item} active={pathname === item.href} />
-        ))}
-        <div style={{ fontSize: 10, letterSpacing: "0.08em", color: "var(--text3)", padding: "14px 10px 6px", textTransform: "uppercase" }}>Tools</div>
-        {navItems.slice(3, 7).map(item => (
-          <NavItem key={item.href} item={item} active={pathname === item.href} />
-        ))}
-        <div style={{ fontSize: 10, letterSpacing: "0.08em", color: "var(--text3)", padding: "14px 10px 6px", textTransform: "uppercase" }}>Account</div>
-        {navItems.slice(7).map(item => (
-          <NavItem key={item.href} item={item} active={pathname === item.href} />
+      <nav className="flex-1 px-2.5 py-3 overflow-y-auto">
+        {navSections.map(section => (
+          <div key={section.label}>
+            <div className="text-2xs font-semibold tracking-widest text-text3 px-2.5 py-2.5 uppercase">
+              {section.label}
+            </div>
+            {section.items.map(item => {
+              const active = pathname === item.href;
+              return (
+                <button key={item.href} onClick={() => router.push(item.href)}
+                  className={active ? "nav-item-active mb-0.5" : "nav-item mb-0.5"}>
+                  <span className="text-base">{item.icon}</span>
+                  <span className="text-base">{item.label}</span>
+                </button>
+              );
+            })}
+          </div>
         ))}
       </nav>
 
       {/* User */}
-      <div style={{ padding: "12px 10px", borderTop: "1px solid var(--border)" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 10px", borderRadius: 10, cursor: "pointer" }}
-          onClick={handleLogout} title="Click to logout">
-          <div style={{ width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg, var(--accent), #a855f7)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 600, color: "#fff", flexShrink: 0 }}>{initials}</div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 13, fontWeight: 500, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{user?.name}</div>
-            <div style={{ fontSize: 11, color: "var(--text3)" }}>Pro Plan · Logout</div>
+      <div className="px-2.5 py-3 border-t border-border">
+        <button onClick={handleLogout}
+          className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg hover:bg-bg3 transition-colors w-full cursor-pointer"
+          title="Click to logout">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-accent to-purple-500 flex items-center justify-center text-xs font-semibold text-white flex-shrink-0">
+            {initials}
           </div>
-        </div>
+          <div className="flex-1 min-w-0 text-left">
+            <div className="text-base font-medium truncate">{user?.name}</div>
+            <div className="text-xs text-text3">Pro · Logout</div>
+          </div>
+        </button>
       </div>
     </aside>
-  );
-}
-
-function NavItem({ item, active }: { item: typeof navItems[0]; active: boolean }) {
-  const router = useRouter();
-  return (
-    <button onClick={() => router.push(item.href)} style={{
-      display: "flex", alignItems: "center", gap: 10, padding: "9px 10px",
-      borderRadius: 8, cursor: "pointer", width: "100%", border: "none", textAlign: "left",
-      background: active ? "var(--accent-glow, #6c63ff20)" : "none",
-      color: active ? "var(--accent)" : "var(--text2)",
-      fontSize: 13, fontWeight: active ? 500 : 400, marginBottom: 2, transition: "all .15s",
-    }}>
-      <span style={{ fontSize: 15 }}>{item.icon}</span>
-      {item.label}
-    </button>
   );
 }

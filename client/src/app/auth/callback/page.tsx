@@ -11,30 +11,20 @@ export default function AuthCallback() {
 
   useEffect(() => {
     const token = params.get("token");
-    const error = params.get("error");
+    if (!token) { router.push("/login?error=oauth_failed"); return; }
 
-    if (error || !token) {
-      router.push("/login?error=oauth_failed");
-      return;
-    }
-
-    api.get("/auth/me", {
-      headers: { Authorization: `Bearer ${token}` },
-    }).then(({ data }) => {
-      setAuth(data.data.user, token);
-      router.push("/dashboard");
-    }).catch(() => {
-      router.push("/login?error=oauth_failed");
-    });
+    api.get("/auth/me", { headers: { Authorization: `Bearer ${token}` } })
+      .then(({ data }) => { setAuth(data.data.user, token); router.push("/dashboard"); })
+      .catch(() => router.push("/login?error=oauth_failed"));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--bg)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <div style={{ textAlign: "center" }}>
-        <div style={{ width: 40, height: 40, border: "3px solid var(--accent)", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite", margin: "0 auto 16px" }} />
-        <p style={{ color: "var(--text2)", fontSize: 14 }}>Completing sign in...</p>
+    <div className="min-h-screen bg-bg flex items-center justify-center">
+      <div className="text-center">
+        <div className="w-10 h-10 spinner-lg mb-4" style={{ width: 40, height: 40 }} />
+        <p className="text-text2 text-base">Completing sign in...</p>
       </div>
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }

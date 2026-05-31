@@ -4,29 +4,35 @@ import { usePathname } from "next/navigation";
 import NewStartupForm from "@/components/startup/NewStartupForm";
 
 const titles: Record<string, string> = {
-  "/dashboard": "Dashboard", "/startups": "My Startups",
-  "/ai-chat": "AI Co-Founder", "/validator": "Idea Validator",
-  "/market": "Market Research", "/financials": "Financials",
-  "/pitch": "Pitch Deck", "/settings": "Settings",
-  "/branding": "Branding Assistant",
+  "/dashboard":  "Dashboard",
+  "/startups":   "My Startups",
+  "/ai-chat":    "AI Co-Founder",
+  "/validator":  "Idea Validator",
+  "/market":     "Market Research",
+  "/financials": "Financials",
+  "/branding":   "Branding Assistant",
+  "/pitch":      "Pitch Deck",
+  "/settings":   "Settings",
 };
 
 export default function Topbar() {
   const pathname = usePathname();
   const [showModal, setShowModal] = useState(false);
 
+  const title = Object.keys(titles).find(k => pathname.startsWith(k))
+    ? titles[Object.keys(titles).find(k => pathname.startsWith(k))!]
+    : "Dashboard";
+
   return (
     <>
-      <header style={{ height: 56, borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 24px", background: "var(--bg2)", flexShrink: 0 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <span style={{ fontSize: 16, fontWeight: 600 }}>{titles[pathname] || "Dashboard"}</span>
-          <span style={{ display: "inline-flex", alignItems: "center", padding: "3px 8px", borderRadius: 20, fontSize: 11, fontWeight: 500, background: "#6c63ff20", color: "var(--accent)", border: "1px solid #6c63ff30" }}>✦ Pro</span>
+      <header className="h-14 border-b border-border flex items-center justify-between px-6 bg-bg2 flex-shrink-0">
+        <div className="flex items-center gap-3">
+          <span className="text-xl font-semibold font-head">{title}</span>
+          <span className="badge-accent text-xs">✦ Pro</span>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <button onClick={() => setShowModal(true)} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "7px 14px", borderRadius: 10, fontSize: 13, fontWeight: 500, cursor: "pointer", background: "var(--accent)", border: "none", color: "#fff" }}>
-            + New Startup
-          </button>
-        </div>
+        <button onClick={() => setShowModal(true)} className="btn-primary text-sm px-3.5 py-1.5">
+          + New Startup
+        </button>
       </header>
       {showModal && <NewStartupForm onClose={() => setShowModal(false)} />}
     </>

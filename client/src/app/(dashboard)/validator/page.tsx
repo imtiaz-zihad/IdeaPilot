@@ -5,31 +5,29 @@ import { Startup } from "@/types";
 
 interface ValidationResult {
   overallScore: number;
-  demand:        { score: number; label: string; summary: string };
-  competition:   { score: number; label: string; summary: string };
-  monetization:  { score: number; label: string; summary: string };
-  scalability:   { score: number; label: string; summary: string };
-  risk:          { score: number; label: string; summary: string };
-  strengths:     string[];
-  weaknesses:    string[];
+  demand: { score: number; label: string; summary: string };
+  competition: { score: number; label: string; summary: string };
+  monetization: { score: number; label: string; summary: string };
+  scalability: { score: number; label: string; summary: string };
+  risk: { score: number; label: string; summary: string };
+  strengths: string[];
+  weaknesses: string[];
   opportunities: string[];
   recommendation: string;
 }
 
-interface Report {
-  _id: string;
-  result: ValidationResult;
-  cached: boolean;
-  createdAt: string;
-}
+const scoreColor = (s: number) => s >= 75 ? "var(--green)" : s >= 50 ? "var(--amber)" : "var(--red)";
+const scoreText  = (s: number) => s >= 75 ? "text-success" : s >= 50 ? "text-warning" : "text-danger";
+const scoreLabel = (s: number) => s >= 85 ? "Investor Ready" : s >= 70 ? "Strong Idea" : s >= 55 ? "Needs Work" : s >= 40 ? "Risky" : "Not Viable";
 
 export default function ValidatorPage() {
-  const [startups,  setStartups]  = useState<Startup[]>([]);
-  const [selected,  setSelected]  = useState<string>("");
-  const [report,    setReport]    = useState<Report | null>(null);
-  const [loading,   setLoading]   = useState(false);
-  const [fetching,  setFetching]  = useState(true);
-  const [error,     setError]     = useState("");
+  const [startups, setStartups] = useState<Startup[]>([]);
+  const [selected, setSelected] = useState("");
+  const [result,   setResult]   = useState<ValidationResult | null>(null);
+  const [loading,  setLoading]  = useState(false);
+  const [fetching, setFetching] = useState(true);
+  const [cached,   setCached]   = useState(false);
+  const [error,    setError]    = useState("");
 
   useEffect(() => {
     api.get("/startups").then(({ data }) => {
@@ -38,223 +36,151 @@ export default function ValidatorPage() {
     }).finally(() => setFetching(false));
   }, []);
 
-  const handleValidate = async (revalidate = false) => {
+  const handleValidate = async (regen = false) => {
     if (!selected) return;
-    setLoading(true);
-    setError("");
-    setReport(null);
+    setLoading(true); setError(""); setResult(null);
     try {
-      const endpoint = revalidate
-        ? `/startups/${selected}/revalidate`
-        : `/startups/${selected}/validate`;
-      const { data } = await api.post(endpoint);
-      setReport(data.data.report);
+      const { data } = await api.post(`/startups/${selected}/${regen ? "revalidate" : "validate"}`);
+      setResult(data.data.report.result);
+      setCached(data.data.cached ?? false);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
-      setError(err.response?.data?.message || "Validation failed. Try again.");
-    } finally {
-      setLoading(false);
-    }
+      setError(err.response?.data?.message || "Validation failed.");
+    } finally { setLoading(false); }
   };
 
-  const result = report?.result;
-
   return (
-    <div style={{ maxWidth: 900, margin: "0 auto" }}>
-      {/* Header */}
-      <div style={{ marginBottom: 28 }}>
-        <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 6 }}>🎯 Idea Validator</h1>
-        <p style={{ color: "var(--text2)", fontSize: 14 }}>AI analyzes your startup idea across 5 dimensions and gives an investor readiness score.</p>
+    <div className="max-w-4xl mx-auto">
+      <div className="mb-7">
+        <h1 className="text-[22px] font-bold font-head mb-1.5">🎯 Idea Validator</h1>
+        <p className="text-text2 text-[13px]">AI analyzes your startup across 5 dimensions and gives an investor readiness score.</p>
       </div>
 
-      {/* Select + Validate */}
-      <div style={{ background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: 14, padding: 20, marginBottom: 24 }}>
-        <div style={{ display: "flex", gap: 12, alignItems: "flex-end", flexWrap: "wrap" }}>
-          <div style={{ flex: 1, minWidth: 200 }}>
-            <label style={{ display: "block", fontSize: 12, color: "var(--text2)", marginBottom: 6 }}>Select startup to validate</label>
-            {fetching ? (
-              <div style={inputStyle}>Loading startups...</div>
-            ) : startups.length === 0 ? (
-              <div style={{ ...inputStyle, color: "var(--text3)" }}>No startups yet — create one first</div>
-            ) : (
-              <select style={inputStyle} value={selected} onChange={e => { setSelected(e.target.value); setReport(null); }}>
-                {startups.map(s => (
-                  <option key={s._id} value={s._id}>{s.startupName} — {s.industry}</option>
-                ))}
-              </select>
-            )}
+      {/* Controls */}
+      <div className="card mb-6">
+        <div className="flex gap-3 items-end flex-wrap">
+          <div className="flex-1 min-w-[200px]">
+            <label className="label">Select startup to validate</label>
+            {fetching ? <div className="input text-text3">Loading...</div>
+              : startups.length === 0 ? <div className="input text-text3">No startups yet</div>
+              : (
+                <select className="input" value={selected}
+                  onChange={e => { setSelected(e.target.value); setResult(null); }}>
+                  {startups.map(s => <option key={s._id} value={s._id}>{s.startupName} — {s.industry}</option>)}
+                </select>
+              )}
           </div>
-          <button
-            onClick={() => handleValidate(false)}
-            disabled={loading || !selected}
-            style={primaryBtn}>
-            {loading ? <><Spinner /> Analyzing...</> : "✦ Validate Idea"}
+          <button onClick={() => handleValidate(false)} disabled={loading || !selected} className="btn-primary">
+            {loading ? <><span className="spinner w-3.5 h-3.5" /> Analyzing...</> : "✦ Validate Idea"}
           </button>
-          {report && (
-            <button onClick={() => handleValidate(true)} disabled={loading} style={ghostBtn}>
-              ↺ Re-analyze
-            </button>
-          )}
+          {result && <button onClick={() => handleValidate(true)} disabled={loading} className="btn-ghost">↺ Re-analyze</button>}
         </div>
-        {error && <p style={{ color: "var(--red)", fontSize: 13, marginTop: 12 }}>{error}</p>}
+        {error && <p className="text-danger text-[13px] mt-3">{error}</p>}
       </div>
 
-      {/* Loading state */}
+      {/* Loading */}
       {loading && (
-        <div style={{ background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: 14, padding: 48, textAlign: "center" }}>
-          <div style={spinnerStyle} />
-          <p style={{ color: "var(--text2)", fontSize: 14, marginTop: 16 }}>Gemini AI is analyzing your startup idea...</p>
-          <p style={{ color: "var(--text3)", fontSize: 12, marginTop: 6 }}>This takes 5–10 seconds</p>
+        <div className="card py-14 text-center">
+          <div className="spinner-lg w-10 h-10 mb-4" />
+          <p className="text-text2 text-[14px]">Gemini AI is analyzing your startup idea...</p>
+          <p className="text-text3 text-[12px] mt-1.5">This takes 5–10 seconds</p>
         </div>
       )}
 
       {/* Results */}
       {!loading && result && (
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-
-          {/* Overall Score */}
-          <div style={{ background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: 14, padding: 28, display: "flex", alignItems: "center", gap: 28, flexWrap: "wrap" }}>
-            <div style={{ position: "relative", width: 120, height: 120, flexShrink: 0 }}>
-              <svg width="120" height="120" viewBox="0 0 120 120" style={{ transform: "rotate(-90deg)" }}>
-                <circle cx="60" cy="60" r="50" fill="none" stroke="var(--bg4)" strokeWidth="10" />
-                <circle cx="60" cy="60" r="50" fill="none"
-                  stroke={scoreColor(result.overallScore)}
-                  strokeWidth="10" strokeLinecap="round"
-                  strokeDasharray="314"
-                  strokeDashoffset={314 - (314 * result.overallScore) / 100}
-                />
+        <div className="flex flex-col gap-4">
+          {/* Overall score */}
+          <div className="card flex gap-6 items-center flex-wrap">
+            <div className="relative w-[120px] h-[120px] flex-shrink-0">
+              <svg width="120" height="120" viewBox="0 0 120 120" className="rotate-[-90deg]">
+                <circle cx="60" cy="60" r="50" fill="none" stroke="var(--bg4)" strokeWidth="10"/>
+                <circle cx="60" cy="60" r="50" fill="none" stroke={scoreColor(result.overallScore)}
+                  strokeWidth="10" strokeLinecap="round" strokeDasharray="314"
+                  strokeDashoffset={314 - (314 * result.overallScore) / 100}/>
               </svg>
-              <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", textAlign: "center" }}>
-                <div style={{ fontSize: 28, fontWeight: 700, color: scoreColor(result.overallScore) }}>{result.overallScore}</div>
-                <div style={{ fontSize: 10, color: "var(--text3)" }}>/100</div>
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className={`text-[28px] font-bold font-head ${scoreText(result.overallScore)}`}>{result.overallScore}</span>
+                <span className="text-[10px] text-text3">/100</span>
               </div>
             </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
-                <span style={{ fontSize: 20, fontWeight: 700 }}>Overall Score</span>
-                <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 12, fontWeight: 500, background: `${scoreColor(result.overallScore)}20`, color: scoreColor(result.overallScore), border: `1px solid ${scoreColor(result.overallScore)}40` }}>
-                  {scoreLabel(result.overallScore)}
+            <div className="flex-1">
+              <div className="flex items-center gap-2.5 mb-2 flex-wrap">
+                <span className="text-[20px] font-bold">{scoreLabel(result.overallScore)}</span>
+                <span className={`badge border ${scoreText(result.overallScore)}`}
+                  style={{ background: `${scoreColor(result.overallScore)}18`, borderColor: `${scoreColor(result.overallScore)}40` }}>
+                  {result.overallScore}/100
                 </span>
-                {report?.cached && <span style={{ fontSize: 11, color: "var(--text3)", padding: "2px 8px", border: "1px solid var(--border)", borderRadius: 10 }}>cached</span>}
+                {cached && <span className="text-[11px] text-text3 px-2 py-0.5 border border-border rounded-[8px]">cached</span>}
               </div>
-              <p style={{ fontSize: 14, color: "var(--text2)", lineHeight: 1.6 }}>{result.recommendation}</p>
+              <p className="text-[14px] text-text2 leading-relaxed">{result.recommendation}</p>
             </div>
           </div>
 
-          {/* 5 Dimension Cards */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 14 }}>
+          {/* 5 dimensions */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
             {[
-              { key: "demand",       label: "Market Demand",     icon: "📈", data: result.demand },
-              { key: "competition",  label: "Competition",        icon: "⚔️",  data: result.competition },
-              { key: "monetization", label: "Monetization",       icon: "💰", data: result.monetization },
-              { key: "scalability",  label: "Scalability",        icon: "🚀", data: result.scalability },
-              { key: "risk",         label: "Risk Level",         icon: "⚠️",  data: result.risk },
-            ].map(({ label, icon, data }) => (
-              <div key={label} style={{ background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: 14, padding: 18 }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <span style={{ fontSize: 18 }}>{icon}</span>
-                    <span style={{ fontSize: 13, fontWeight: 500 }}>{label}</span>
+              { key:"demand",       label:"Market Demand", icon:"📈" },
+              { key:"competition",  label:"Competition",   icon:"⚔️" },
+              { key:"monetization", label:"Monetization",  icon:"💰" },
+              { key:"scalability",  label:"Scalability",   icon:"🚀" },
+              { key:"risk",         label:"Risk Level",    icon:"⚠️" },
+            ].map(({ key, label, icon }) => {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const dim = result[key as keyof ValidationResult] as any;
+              if (!dim) return null;
+              const c = scoreColor(dim.score);
+              const ct = scoreText(dim.score);
+              return (
+                <div key={key} className="card-sm">
+                  <div className="flex items-center justify-between mb-2.5">
+                    <span className="text-[13px] font-medium">{icon} {label}</span>
+                    <span className={`badge border text-[11px] ${ct}`}
+                      style={{ background: `${c}18`, borderColor: `${c}40` }}>{dim.label}</span>
                   </div>
-                  <span style={{ padding: "2px 8px", borderRadius: 10, fontSize: 11, fontWeight: 500, background: `${scoreColor(data.score)}20`, color: scoreColor(data.score) }}>
-                    {data.label}
-                  </span>
+                  <div className="h-1.5 bg-bg4 rounded-full mb-2.5 overflow-hidden">
+                    <div className="h-full rounded-full transition-all duration-700" style={{ width: `${dim.score}%`, background: c }} />
+                  </div>
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-[11px] text-text3">Score</span>
+                    <span className={`text-[14px] font-bold ${ct}`}>{dim.score}/100</span>
+                  </div>
+                  <p className="text-[12px] text-text2 leading-relaxed">{dim.summary}</p>
                 </div>
-                {/* Score bar */}
-                <div style={{ height: 6, background: "var(--bg4)", borderRadius: 3, marginBottom: 10, overflow: "hidden" }}>
-                  <div style={{ height: "100%", width: `${data.score}%`, background: scoreColor(data.score), borderRadius: 3, transition: "width 1s ease" }} />
-                </div>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                  <span style={{ fontSize: 11, color: "var(--text3)" }}>Score</span>
-                  <span style={{ fontSize: 14, fontWeight: 700, color: scoreColor(data.score) }}>{data.score}/100</span>
-                </div>
-                <p style={{ fontSize: 12, color: "var(--text2)", lineHeight: 1.6 }}>{data.summary}</p>
+              );
+            })}
+          </div>
+
+          {/* SWOT */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+            {[
+              { title:"✅ Strengths",     items:result.strengths,     color:"var(--green)", cls:"bg-success/5 border-success/20" },
+              { title:"⚠️ Weaknesses",    items:result.weaknesses,    color:"var(--red)",   cls:"bg-danger/5 border-danger/20" },
+              { title:"🌟 Opportunities", items:result.opportunities, color:"var(--amber)", cls:"bg-warning/5 border-warning/20" },
+            ].map(c => (
+              <div key={c.title} className={`rounded-[12px] border p-4 ${c.cls}`}>
+                <div className="text-[13px] font-semibold mb-3" style={{ color: c.color }}>{c.title}</div>
+                <ul className="flex flex-col gap-2">
+                  {(c.items||[]).map((item, i) => (
+                    <li key={i} className="flex gap-2 text-[12px] text-text2 leading-relaxed">
+                      <span style={{ color: c.color }} className="flex-shrink-0 mt-0.5">→</span>{item}
+                    </li>
+                  ))}
+                </ul>
               </div>
             ))}
           </div>
-
-          {/* SWOT-style grid */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 14 }}>
-            <SwotCard title="✅ Strengths"     items={result.strengths}     color="var(--green)" bg="#22c55e12" />
-            <SwotCard title="⚠️ Weaknesses"    items={result.weaknesses}    color="var(--red)"   bg="#ef444412" />
-            <SwotCard title="🌟 Opportunities" items={result.opportunities} color="var(--amber)" bg="#f59e0b12" />
-          </div>
-
         </div>
       )}
 
-      {/* Empty state */}
-      {!loading && !report && !error && (
-        <div style={{ background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: 14, padding: 48, textAlign: "center" }}>
-          <div style={{ fontSize: 48, marginBottom: 14 }}>🎯</div>
-          <p style={{ fontSize: 15, fontWeight: 500, marginBottom: 8 }}>Ready to validate your idea?</p>
-          <p style={{ fontSize: 13, color: "var(--text2)" }}>Select a startup above and click Validate — Gemini AI will score it in seconds.</p>
+      {/* Empty */}
+      {!loading && !result && !error && (
+        <div className="card py-14 text-center">
+          <div className="text-[52px] mb-4">🎯</div>
+          <p className="text-[15px] font-semibold mb-2">Ready to validate your idea?</p>
+          <p className="text-text2 text-[13px]">Select a startup above and click Validate — Gemini AI will score it in seconds.</p>
         </div>
       )}
     </div>
   );
 }
-
-// ── Sub-components ────────────────────────────────────────
-
-function SwotCard({ title, items, color, bg }: { title: string; items: string[]; color: string; bg: string }) {
-  return (
-    <div style={{ background: bg, border: `1px solid ${color}25`, borderRadius: 14, padding: 18 }}>
-      <div style={{ fontSize: 13, fontWeight: 600, color, marginBottom: 12 }}>{title}</div>
-      <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: 8 }}>
-        {items.map((item, i) => (
-          <li key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 13, color: "var(--text2)", lineHeight: 1.5 }}>
-            <span style={{ color, flexShrink: 0, marginTop: 1 }}>→</span>
-            {item}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-function Spinner() {
-  return <span style={{ width: 12, height: 12, border: "2px solid #fff4", borderTopColor: "#fff", borderRadius: "50%", display: "inline-block", animation: "spin .7s linear infinite" }} />;
-}
-
-// ── Helpers ───────────────────────────────────────────────
-
-function scoreColor(score: number): string {
-  if (score >= 75) return "var(--green)";
-  if (score >= 50) return "var(--amber)";
-  return "var(--red)";
-}
-
-function scoreLabel(score: number): string {
-  if (score >= 85) return "Investor Ready";
-  if (score >= 70) return "Strong Idea";
-  if (score >= 55) return "Needs Work";
-  if (score >= 40) return "Risky";
-  return "Not Viable";
-}
-
-// ── Styles ────────────────────────────────────────────────
-
-const inputStyle: React.CSSProperties = {
-  width: "100%", background: "var(--bg3)", border: "1px solid var(--border)",
-  borderRadius: 10, padding: "9px 12px", fontSize: 13, color: "var(--text)", outline: "none",
-};
-
-const primaryBtn: React.CSSProperties = {
-  display: "inline-flex", alignItems: "center", gap: 8,
-  padding: "9px 20px", borderRadius: 10, background: "var(--accent)",
-  border: "none", color: "#fff", fontSize: 13, fontWeight: 500,
-  cursor: "pointer", flexShrink: 0,
-};
-
-const ghostBtn: React.CSSProperties = {
-  padding: "9px 16px", borderRadius: 10, background: "none",
-  border: "1px solid var(--border2)", color: "var(--text2)",
-  fontSize: 13, cursor: "pointer", flexShrink: 0,
-};
-
-const spinnerStyle: React.CSSProperties = {
-  width: 40, height: 40, border: "3px solid var(--bg4)",
-  borderTopColor: "var(--accent)", borderRadius: "50%",
-  animation: "spin .8s linear infinite", margin: "0 auto",
-};
