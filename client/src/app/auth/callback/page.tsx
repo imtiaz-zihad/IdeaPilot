@@ -1,10 +1,10 @@
 "use client";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 import api from "@/lib/api";
 
-export default function AuthCallback() {
+function CallbackInner() {
   const router = useRouter();
   const params = useSearchParams();
   const { setAuth } = useAuthStore();
@@ -16,7 +16,7 @@ export default function AuthCallback() {
     api.get("/auth/me", { headers: { Authorization: `Bearer ${token}` } })
       .then(({ data }) => { setAuth(data.data.user, token); router.push("/dashboard"); })
       .catch(() => router.push("/login?error=oauth_failed"));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -26,5 +26,13 @@ export default function AuthCallback() {
         <p className="text-text2 text-base">Completing sign in...</p>
       </div>
     </div>
+  );
+}
+
+export default function AuthCallback() {
+  return (
+    <Suspense>
+      <CallbackInner />
+    </Suspense>
   );
 }

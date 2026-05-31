@@ -35,7 +35,7 @@ export default function NewStartupForm({ onClose }: { onClose: () => void }) {
           </div>
           <div>
             <label className="label">Your idea</label>
-            <textarea className="input min-h-[80px] resize-y leading-relaxed" placeholder="Describe your startup idea..."
+            <textarea className="input min-h-20 resize-y leading-relaxed" placeholder="Describe your startup idea..."
               required value={form.idea} onChange={e => setForm(p => ({ ...p, idea: e.target.value }))} />
           </div>
           <div className="grid grid-cols-2 gap-3">
