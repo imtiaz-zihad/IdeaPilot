@@ -14,6 +14,7 @@ AI Idea Validator (scores idea 0–100 based on demand, competition, scalability
 ## 🌐 Live Demo
 
 Front-end: https://idea-pilot-one.vercel.app
+
 Back-end: https://ideapilot-in2u.onrender.com
 
 ---
