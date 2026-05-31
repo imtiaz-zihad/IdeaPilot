@@ -29,6 +29,9 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Routes
+app.get("/", (req, res) => {
+  res.json({ success: true, message: "IdeaPilot API is running 🚀" });
+});
 app.use("/api/auth",     authRoutes);
 app.use("/api/startups", startupRoutes);
 app.use("/api/startups", validatorRoutes); // mounts as /api/startups/:id/validate
