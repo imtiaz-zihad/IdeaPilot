@@ -49,12 +49,12 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="w-[220px] min-h-screen bg-bg2 border-r border-border flex flex-col shrink-0">
+    <aside className="w-55 min-h-screen bg-bg2 border-r border-border flex flex-col shrink-0">
 
       {/* Logo */}
-      <div className="flex items-center gap-2.5 px-5 py-[18px] border-b border-border">
+      <div className="flex items-center gap-2.5 px-5 py-4.5 border-b border-border">
         <div
-          className="w-8 h-8 bg-accent rounded-[8px] flex items-center justify-center text-[13px] font-bold text-white shrink-0"
+          className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center text-[13px] font-bold text-white shrink-0"
           style={{ fontFamily: "'Syne', sans-serif" }}
         >
           AI

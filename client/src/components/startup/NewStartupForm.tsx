@@ -44,7 +44,7 @@ export default function NewStartupForm({ onClose }: Props) {
       onClick={e => e.target === e.currentTarget && onClose()}
     >
       {/* Modal */}
-      <div className="w-full max-w-[480px] bg-bg2 border border-border2 rounded-[18px] p-7 slide-up">
+      <div className="w-full max-w-120 bg-bg2 border border-border2 rounded-[18px] p-7 slide-up">
 
         <h2 className="text-[18px] font-bold text-text mb-5">🚀 Launch New Startup</h2>
 
@@ -66,7 +66,7 @@ export default function NewStartupForm({ onClose }: Props) {
           <div>
             <label className="label">Your idea</label>
             <textarea
-              className="input min-h-[80px] resize-y leading-relaxed"
+              className="input min-h-20 resize-y leading-relaxed"
               placeholder="Describe your startup idea in detail..."
               required
               value={form.idea}
