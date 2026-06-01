@@ -3,13 +3,28 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import api from "@/lib/api";
 
-export default function NewStartupForm({ onClose }: { onClose: () => void }) {
-  const router = useRouter();
-  const [form, setForm]       = useState({ startupName: "", idea: "", industry: "Food Tech", country: "", targetAudience: "" });
-  const [loading, setLoading] = useState(false);
-  const [error, setError]     = useState("");
+const INDUSTRIES = [
+  "Food Tech", "HealthTech", "EdTech", "FinTech", "SaaS",
+  "E-Commerce", "AI / ML", "CleanTech", "LogisticsTech",
+];
 
-  const handleSubmit = async (e: React.FormEvent) => {
+interface Props { onClose: () => void; }
+
+export default function NewStartupForm({ onClose }: Props) {
+  const router = useRouter();
+  const [form, setForm] = useState({
+    startupName: "", idea: "", industry: "Food Tech",
+    country: "", targetAudience: "",
+  });
+  const [loading, setLoading] = useState(false);
+  const [error,   setError]   = useState("");
+
+  const set =
+    (k: keyof typeof form) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
+      setForm(p => ({ ...p, [k]: e.target.value }));
+
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true); setError("");
     try {
@@ -23,48 +38,92 @@ export default function NewStartupForm({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 animate-fade-in"
-      onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="bg-bg2 border border-border2 rounded-xl p-7 w-full max-w-lg animate-slide-up">
-        <h2 className="text-2xl font-bold mb-5">🚀 Launch New Startup</h2>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-3.5">
+    /* Backdrop */
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 fade-in"
+      onClick={e => e.target === e.currentTarget && onClose()}
+    >
+      {/* Modal */}
+      <div className="w-full max-w-[480px] bg-bg2 border border-border2 rounded-[18px] p-7 slide-up">
+
+        <h2 className="text-[18px] font-bold text-text mb-5">🚀 Launch New Startup</h2>
+
+        <form onSubmit={submit} className="flex flex-col gap-3.5">
+
+          {/* Startup name */}
           <div>
             <label className="label">Startup name</label>
-            <input className="input" placeholder="e.g. CampusEats" required
-              value={form.startupName} onChange={e => setForm(p => ({ ...p, startupName: e.target.value }))} />
+            <input
+              className="input"
+              placeholder="e.g. CampusEats"
+              required
+              value={form.startupName}
+              onChange={set("startupName")}
+            />
           </div>
+
+          {/* Idea */}
           <div>
             <label className="label">Your idea</label>
-            <textarea className="input min-h-20 resize-y leading-relaxed" placeholder="Describe your startup idea..."
-              required value={form.idea} onChange={e => setForm(p => ({ ...p, idea: e.target.value }))} />
+            <textarea
+              className="input min-h-[80px] resize-y leading-relaxed"
+              placeholder="Describe your startup idea in detail..."
+              required
+              value={form.idea}
+              onChange={set("idea")}
+            />
           </div>
+
+          {/* Industry + Country */}
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="label">Industry</label>
-              <select className="input" value={form.industry} onChange={e => setForm(p => ({ ...p, industry: e.target.value }))}>
-                {["Food Tech","HealthTech","EdTech","FinTech","SaaS","E-Commerce","AI / ML","CleanTech","LogisticsTech"].map(i => (
-                  <option key={i}>{i}</option>
-                ))}
+              <select className="input" value={form.industry} onChange={set("industry")}>
+                {INDUSTRIES.map(i => <option key={i}>{i}</option>)}
               </select>
             </div>
             <div>
               <label className="label">Country</label>
-              <input className="input" placeholder="e.g. Bangladesh" required
-                value={form.country} onChange={e => setForm(p => ({ ...p, country: e.target.value }))} />
+              <input
+                className="input"
+                placeholder="e.g. Bangladesh"
+                required
+                value={form.country}
+                onChange={set("country")}
+              />
             </div>
           </div>
+
+          {/* Target audience */}
           <div>
             <label className="label">Target audience</label>
-            <input className="input" placeholder="e.g. University students aged 18–25" required
-              value={form.targetAudience} onChange={e => setForm(p => ({ ...p, targetAudience: e.target.value }))} />
+            <input
+              className="input"
+              placeholder="e.g. University students aged 18–25"
+              required
+              value={form.targetAudience}
+              onChange={set("targetAudience")}
+            />
           </div>
-          {error && <p className="text-danger text-sm">{error}</p>}
-          <div className="flex gap-2.5 justify-end mt-2">
-            <button type="button" onClick={onClose} className="btn-ghost">Cancel</button>
+
+          {/* Error */}
+          {error && (
+            <p className="text-[12px] text-danger">{error}</p>
+          )}
+
+          {/* Actions */}
+          <div className="flex items-center justify-end gap-2.5 pt-1">
+            <button type="button" onClick={onClose} className="btn-ghost">
+              Cancel
+            </button>
             <button type="submit" disabled={loading} className="btn-primary">
-              {loading ? <><span className="spinner w-3.5 h-3.5" /> Creating...</> : "✦ Generate with AI"}
+              {loading
+                ? <><span className="spinner w-3.5 h-3.5" /> Creating...</>
+                : "✦ Generate with AI"
+              }
             </button>
           </div>
+
         </form>
       </div>
     </div>

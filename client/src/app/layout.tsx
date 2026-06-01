@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "CoFounder AI — Build Startups with AI",
+  title: "IdeaPilot AI — Build Startups with AI",
   description: "AI-powered startup incubator platform",
 };
 

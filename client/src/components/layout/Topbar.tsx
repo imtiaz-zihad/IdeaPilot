@@ -16,25 +16,40 @@ const titles: Record<string, string> = {
 };
 
 export default function Topbar() {
-  const pathname = usePathname();
-  const [showModal, setShowModal] = useState(false);
+  const pathname      = usePathname();
+  const [show, setShow] = useState(false);
 
-  const title = Object.keys(titles).find(k => pathname.startsWith(k))
-    ? titles[Object.keys(titles).find(k => pathname.startsWith(k))!]
-    : "Dashboard";
+  const title =
+    Object.entries(titles).find(
+      ([k]) => pathname === k || pathname.startsWith(k + "/")
+    )?.[1] ?? "Dashboard";
 
   return (
     <>
-      <header className="h-14 border-b border-border flex items-center justify-between px-6 bg-bg2 flex-shrink-0">
+      <header className="h-14 shrink-0 bg-bg2 border-b border-border flex items-center justify-between px-6">
+
+        {/* Left — title + badge */}
         <div className="flex items-center gap-3">
-          <span className="text-xl font-semibold font-head">{title}</span>
-          <span className="badge-accent text-xs">✦ Pro</span>
+          <h1
+            className="text-[16px] font-semibold text-text"
+            style={{ fontFamily: "'Syne', sans-serif" }}
+          >
+            {title}
+          </h1>
+          <span className="badge-accent">✦ Pro</span>
         </div>
-        <button onClick={() => setShowModal(true)} className="btn-primary text-sm px-3.5 py-1.5">
+
+        {/* Right — action */}
+        <button
+          onClick={() => setShow(true)}
+          className="btn-primary"
+        >
           + New Startup
         </button>
+
       </header>
-      {showModal && <NewStartupForm onClose={() => setShowModal(false)} />}
+
+      {show && <NewStartupForm onClose={() => setShow(false)} />}
     </>
   );
 }
