@@ -6,13 +6,13 @@ import { verifyRefreshToken, generateAccessToken } from "../utils/jwt";
 import { User } from "../models/user.model";
 
 const registerSchema = z.object({
-  name:     z.string().min(2),
-  email:    z.string().email(),
+  name: z.string().min(2),
+  email: z.string().email(),
   password: z.string().min(8),
 });
 
 const loginSchema = z.object({
-  email:    z.string().email(),
+  email: z.string().email(),
   password: z.string().min(1),
 });
 
@@ -20,7 +20,9 @@ export const register = async (req: Request, res: Response) => {
   try {
     const body = registerSchema.parse(req.body);
     const { user, accessToken, refreshToken } = await registerUser(
-      body.name, body.email, body.password
+      body.name,
+      body.email,
+      body.password,
     );
 
     res.cookie("refreshToken", refreshToken, {
@@ -30,7 +32,15 @@ export const register = async (req: Request, res: Response) => {
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
-    sendSuccess(res, { user: { id: user._id, name: user.name, email: user.email }, accessToken }, "Registered successfully", 201);
+    sendSuccess(
+      res,
+      {
+        user: { id: user._id, name: user.name, email: user.email },
+        accessToken,
+      },
+      "Registered successfully",
+      201,
+    );
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : "Registration failed";
     sendError(res, msg, 400);
@@ -40,16 +50,27 @@ export const register = async (req: Request, res: Response) => {
 export const login = async (req: Request, res: Response) => {
   try {
     const body = loginSchema.parse(req.body);
-    const { user, accessToken, refreshToken } = await loginUser(body.email, body.password);
+    const { user, accessToken, refreshToken } = await loginUser(
+      body.email,
+      body.password,
+    );
+
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: process.env.NODE_ENV === "production", // HTTPS only in prod
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    sendSuccess(res, { user: { id: user._id, name: user.name, email: user.email }, accessToken }, "Logged in successfully");
+    sendSuccess(
+      res,
+      {
+        user: { id: user._id, name: user.name, email: user.email },
+        accessToken,
+      },
+      "Logged in successfully",
+    );
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : "Login failed";
     sendError(res, msg, 401);
@@ -63,7 +84,8 @@ export const refreshTokenHandler = async (req: Request, res: Response) => {
 
     const { userId } = verifyRefreshToken(token);
     const user = await User.findById(userId).select("+refreshToken");
-    if (!user || user.refreshToken !== token) return sendError(res, "Invalid refresh token", 401);
+    if (!user || user.refreshToken !== token)
+      return sendError(res, "Invalid refresh token", 401);
 
     const newAccessToken = generateAccessToken(userId);
     sendSuccess(res, { accessToken: newAccessToken }, "Token refreshed");

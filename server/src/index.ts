@@ -42,6 +42,22 @@ app.use("/api/startups", pitchDeckRoutes);
 app.use(notFound);
 app.use(globalErrorHandler);
 
+app.use(cors({
+  origin: (origin, callback) => {
+    const allowed = [
+      "http://localhost:3000",
+      ENV.CLIENT_URL,        // your deployed frontend URL
+    ].filter(Boolean);
+
+    if (!origin || allowed.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error(`CORS blocked: ${origin}`));
+    }
+  },
+  credentials: true,
+}));
+
 connectDB().then(() => {
   app.listen(ENV.PORT, () => {
     console.log(`🚀 Server running on port ${ENV.PORT}`);
