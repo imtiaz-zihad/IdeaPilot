@@ -60,6 +60,6 @@ app.use(cors({
 
 connectDB().then(() => {
   app.listen(ENV.PORT, () => {
-    console.log(`🚀 Server running on port ${ENV.PORT}`);
+    console.log(`🚀 Server running on this  port  ${ENV.PORT}`);
   });
 });
