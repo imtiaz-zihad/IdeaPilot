@@ -226,6 +226,14 @@ body {
   color: var(--color-text);
 }
 
+.spinner-lg {
+  display: inline-block;
+  border: 3px solid rgba(255,255,255,0.15);
+  border-top-color: var(--color-accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
 .nav-item.active {
   background: rgba(108, 99, 255, 0.12);
   color: var(--color-accent);
