@@ -5,6 +5,13 @@ import { sendSuccess, sendError } from "../utils/apiResponse";
 import { verifyRefreshToken, generateAccessToken } from "../utils/jwt";
 import { User } from "../models/user.model";
 
+const cookieOptions = {
+  httpOnly: true,
+  secure: true,
+  sameSite: "none" as const,
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+};
+
 const registerSchema = z.object({
   name: z.string().min(2),
   email: z.string().email(),
@@ -25,12 +32,7 @@ export const register = async (req: Request, res: Response) => {
       body.password,
     );
 
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    });
+    res.cookie("refreshToken", refreshToken, cookieOptions);
 
     sendSuccess(
       res,
@@ -55,13 +57,7 @@ export const login = async (req: Request, res: Response) => {
       body.password,
     );
 
-    // wherever you set the refreshToken cookie
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: true, // always true for cross-domain
-      sameSite: "none", // ✅ required for cross-domain cookies
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    res.cookie("refreshToken", refreshToken, cookieOptions);
 
     sendSuccess(
       res,
@@ -98,10 +94,18 @@ export const logout = async (req: Request, res: Response) => {
   try {
     const token = req.cookies?.refreshToken;
     if (token) {
-      const { userId } = verifyRefreshToken(token);
-      await User.findByIdAndUpdate(userId, { refreshToken: null });
+      try {
+        const { userId } = verifyRefreshToken(token);
+        await User.findByIdAndUpdate(userId, { refreshToken: null });
+      } catch {
+        // token invalid but still clear cookie
+      }
     }
-    res.clearCookie("refreshToken");
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+    });
     sendSuccess(res, null, "Logged out successfully");
   } catch {
     sendError(res, "Logout failed", 500);

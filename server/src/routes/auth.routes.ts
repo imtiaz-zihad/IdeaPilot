@@ -1,6 +1,6 @@
 import { Router, Request, Response } from "express";
 import passport from "passport";
-import "../config/passport"; // initialize strategies
+import "../config/passport";
 import {
   register,
   login,
@@ -17,6 +17,13 @@ import { protect, AuthRequest } from "../middlewares/auth.middleware";
 import { sendSuccess, sendError } from "../utils/apiResponse";
 
 const router = Router();
+
+const cookieOptions = {
+  httpOnly: true,
+  secure: true,
+  sameSite: "none" as const,
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+};
 
 // ─── Local Auth ──────────────────────────────────────────
 router.post("/register", register);
@@ -48,6 +55,7 @@ router.get(
   handleOAuthCallback
 );
 
+// ─── Me ──────────────────────────────────────────────────
 router.get("/me", protect, async (req: AuthRequest, res: Response) => {
   const user = await User.findById(req.userId).select("-password -refreshToken");
   if (!user) return sendError(res, "User not found", 404);
@@ -59,20 +67,15 @@ async function handleOAuthCallback(req: Request, res: Response) {
   try {
     const user = req.user as any;
 
-    const accessToken = generateAccessToken(user._id.toString());
+    const accessToken  = generateAccessToken(user._id.toString());
     const refreshToken = generateRefreshToken(user._id.toString());
 
     await User.findByIdAndUpdate(user._id, { refreshToken });
 
-    // HttpOnly refresh token cookie
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: ENV.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    // ✅ consistent cookie options — same as login/register
+    res.cookie("refreshToken", refreshToken, cookieOptions);
 
-    // Redirect to frontend with access token in URL (frontend stores in memory)
+    // pass accessToken to frontend via URL
     res.redirect(`${ENV.CLIENT_URL}/auth/callback?token=${accessToken}`);
   } catch {
     res.redirect(`${ENV.CLIENT_URL}/login?error=oauth_failed`);
