@@ -55,11 +55,11 @@ export const login = async (req: Request, res: Response) => {
       body.password,
     );
 
-
+    // wherever you set the refreshToken cookie
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // HTTPS only in prod
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      secure: true, // always true for cross-domain
+      sameSite: "none", // ✅ required for cross-domain cookies
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
