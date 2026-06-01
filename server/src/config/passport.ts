@@ -9,8 +9,9 @@ passport.use(
     {
       clientID: ENV.GOOGLE_CLIENT_ID,
       clientSecret: ENV.GOOGLE_CLIENT_SECRET,
-      callbackURL: `${ENV.OAUTH_CALLBACK_BASE}/api/auth/google/callback`,
-    },
+callbackURL: ENV.NODE_ENV === "production"
+    ? "https://ideapilot-in2u.onrender.com/api/auth/google/callback"
+    : "http://localhost:5000/api/auth/google/callback",    },
     async (_accessToken, _refreshToken, profile, done) => {
       try {
         const email = profile.emails?.[0]?.value;
