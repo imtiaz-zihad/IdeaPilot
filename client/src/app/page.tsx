@@ -47,7 +47,6 @@ return ( <main className="min-h-screen bg-bg text-text overflow-x-hidden">
 {/* Navbar */} <nav className="sticky top-0 z-50 border-b border-border bg-bg/80 backdrop-blur"> <div className="page-wide flex items-center justify-between px-6 py-4"> <div className="flex items-center gap-3"> <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent font-head font-bold text-white">
 AI </div>
 
-```
         <h1 className="font-head text-xl font-bold">
           Idea<span className="text-accent">Pilot</span>
         </h1>
@@ -67,7 +66,7 @@ AI </div>
 
   {/* Hero */}
   <section className="relative py-28 md:py-36">
-    <div className="absolute left-1/2 top-0 h-[450px] w-[450px] -translate-x-1/2 rounded-full bg-accent/20 blur-[120px]" />
+    <div className="absolute left-1/2 top-0 h-112.5 w-112.5 -translate-x-1/2 rounded-full bg-accent/20 blur-[120px]" />
 
     <div className="page relative z-10 px-6 text-center">
       <div className="badge-accent mx-auto mb-6">
@@ -235,9 +234,18 @@ AI </div>
   </section>
 
   {/* Footer */}
-  <footer className="border-t border-border py-8 text-center text-sm text-text3">
-    © 2026 IdeaPilot. Built with Next.js, Gemini AI and Tailwind CSS.
-  </footer>
+
+<footer className="border-t border-border py-8 text-center text-sm text-text3">
+  © 2026 IdeaPilot. Built by{" "}
+  <Link
+    href="https://imtiaz.swe.bd"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="font-medium hover:underline"
+  >
+    Imtiaz
+  </Link>
+</footer>
 </main>
 );
 }

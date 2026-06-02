@@ -63,7 +63,7 @@ export default function Sidebar() {
           className="text-[16px] font-bold text-text"
           style={{ fontFamily: "'Syne', sans-serif" }}
         >
-          Co<span className="text-accent">Founder</span>
+          Idea<span className="text-accent">Pilot</span>
         </span>
       </div>
 
