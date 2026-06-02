@@ -76,7 +76,7 @@ export default function PitchDeckPage() {
       {/* Controls */}
       <div className="card mb-6">
         <div className="flex gap-3 items-end flex-wrap">
-          <div className="flex-1 min-w-[200px]">
+          <div className="flex-1 min-w-50">
             <label className="label">Select startup</label>
             {fetching ? <div className="input text-text3">Loading...</div>
               : startups.length === 0 ? <div className="input text-text3">No startups yet</div>
@@ -93,7 +93,7 @@ export default function PitchDeckPage() {
           {result && <>
             <button onClick={() => handleGenerate(true)} disabled={loading} className="btn-ghost">↺ Regenerate</button>
             <button onClick={exportToPDF} disabled={exporting}
-              className="btn-ghost !text-success !border-success/40 hover:!bg-success/10">
+              className="btn-ghost text-success! border-success/40! hover:bg-success/10!">
               {exporting ? "Exporting..." : "⬇ Export PDF"}
             </button>
           </>}
@@ -118,14 +118,14 @@ export default function PitchDeckPage() {
             <div>
               <div className="flex items-center gap-2.5">
                 <span className="text-[16px] font-bold">{result.deckTitle}</span>
-                {cached && <span className="text-[11px] text-text3 px-2 py-0.5 border border-border rounded-[8px]">cached</span>}
+                {cached && <span className="text-[11px] text-text3 px-2 py-0.5 border border-border rounded-lg">cached</span>}
               </div>
               <p className="text-[12px] text-text2 mt-0.5">{result.tagline}</p>
             </div>
             <div className="flex gap-1.5">
               {(["deck","list"] as const).map(m => (
                 <button key={m} onClick={() => setViewMode(m)}
-                  className={`px-3.5 py-1.5 rounded-[8px] text-[12px] border cursor-pointer capitalize transition-all
+                  className={`px-3.5 py-1.5 rounded-lg text-[12px] border cursor-pointer capitalize transition-all
                     ${viewMode === m ? "bg-accent text-white border-accent" : "bg-bg2 text-text2 border-border hover:bg-bg3"}`}>
                   {m === "deck" ? "🖥 Deck View" : "📋 List View"}
                 </button>
@@ -134,7 +134,7 @@ export default function PitchDeckPage() {
           </div>
 
           {/* Investor Ask */}
-          <div className="flex items-center gap-2.5 px-4 py-3 rounded-[12px] bg-accent/10 border border-accent/25 mb-4">
+          <div className="flex items-center gap-2.5 px-4 py-3 rounded-xl bg-accent/10 border border-accent/25 mb-4">
             <span className="text-[18px]">💰</span>
             <span className="text-[14px] font-medium">{result.investorAsk}</span>
           </div>
@@ -144,7 +144,7 @@ export default function PitchDeckPage() {
             <div>
               {/* Slide */}
               <div ref={deckRef}
-                className="relative rounded-[16px] overflow-hidden border border-border mb-3"
+                className="relative rounded-2xl overflow-hidden border border-border mb-3"
                 style={{ background: "#13151a", aspectRatio: "16/9", minHeight: 340 }}>
                 {/* Accent top bar */}
                 <div className="absolute top-0 left-0 right-0 h-1" style={{ background: accent }} />
@@ -183,7 +183,7 @@ export default function PitchDeckPage() {
                             <ul className="flex flex-col gap-2.5">
                               {slide.bullets.map((b, i) => (
                                 <li key={i} className="flex items-start gap-2.5 text-[13px] text-white/80 leading-relaxed">
-                                  <span className="w-1.5 h-1.5 rounded-full flex-shrink-0 mt-1.5" style={{ background: accent }} />
+                                  <span className="w-1.5 h-1.5 rounded-full shrink-0 mt-1.5" style={{ background: accent }} />
                                   {b}
                                 </li>
                               ))}
@@ -191,7 +191,7 @@ export default function PitchDeckPage() {
                           )}
                         </div>
                         {slide.highlight && (
-                          <div className="w-44 flex-shrink-0 rounded-[14px] p-4 text-center"
+                          <div className="w-44 shrink-0 rounded-[14px] p-4 text-center"
                             style={{ background: `${accent}15`, border: `1px solid ${accent}30` }}>
                             <div className="text-[10px] uppercase tracking-wider mb-2" style={{ color: accent }}>Key Insight</div>
                             <p className="text-[12px] text-white/75 leading-relaxed">{slide.highlight}</p>
@@ -223,7 +223,7 @@ export default function PitchDeckPage() {
               <div className="flex gap-2 overflow-x-auto pb-2">
                 {result.slides.map((s, i) => (
                   <button key={i} onClick={() => setActiveSlide(i)}
-                    className={`flex-shrink-0 w-[100px] rounded-[8px] p-2.5 cursor-pointer text-left transition-all border
+                    className={`shrink-0 w-25 rounded-lg p-2.5 cursor-pointer text-left transition-all border
                       ${i === activeSlide ? "bg-white/10 " : "bg-bg2 border-border hover:bg-bg3"}`}
                     style={{ borderColor: i === activeSlide ? ACCENTS[i] : undefined }}>
                     <div className="text-[10px] font-semibold mb-1" style={{ color: ACCENTS[i] }}>
@@ -242,7 +242,7 @@ export default function PitchDeckPage() {
               {result.slides.map((s, i) => (
                 <div key={i} className="card-sm border-l-[3px]" style={{ borderLeftColor: ACCENTS[i] }}>
                   <div className="flex items-start gap-4">
-                    <div className="w-9 h-9 rounded-[10px] flex items-center justify-center text-[13px] font-bold flex-shrink-0"
+                    <div className="w-9 h-9 rounded-[10px] flex items-center justify-center text-[13px] font-bold shrink-0"
                       style={{ background: `${ACCENTS[i]}20`, color: ACCENTS[i] }}>
                       {String(i+1).padStart(2,"0")}
                     </div>
@@ -255,13 +255,13 @@ export default function PitchDeckPage() {
                         <ul className="flex flex-col gap-1.5 mb-2">
                           {s.bullets.map((b, bi) => (
                             <li key={bi} className="flex items-start gap-2 text-[13px] text-text2 leading-relaxed">
-                              <span className="flex-shrink-0" style={{ color: ACCENTS[i] }}>→</span>{b}
+                              <span className="shrink-0" style={{ color: ACCENTS[i] }}>→</span>{b}
                             </li>
                           ))}
                         </ul>
                       )}
                       {s.highlight && (
-                        <span className="inline-block px-3 py-1 rounded-[8px] text-[12px] mt-1"
+                        <span className="inline-block px-3 py-1 rounded-lg text-[12px] mt-1"
                           style={{ background: `${ACCENTS[i]}15`, color: ACCENTS[i], border: `1px solid ${ACCENTS[i]}25` }}>
                           💡 {s.highlight}
                         </span>

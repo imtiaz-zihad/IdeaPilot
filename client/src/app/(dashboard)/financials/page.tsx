@@ -118,7 +118,7 @@ export default function FinancialsPage() {
       {/* Controls */}
       <div className="card mb-6">
         <div className="flex gap-3 items-end flex-wrap">
-          <div className="flex-1 min-w-[200px]">
+          <div className="flex-1 min-w-50">
             <label className="label">Select startup</label>
             {fetching ? (
               <div className="input text-text3 pointer-events-none">Loading...</div>
@@ -161,7 +161,7 @@ export default function FinancialsPage() {
             <div className="flex items-center gap-2.5 mb-3">
               <span className="text-[15px] font-semibold text-text">Financial Overview</span>
               {cached && (
-                <span className="text-[11px] text-text3 px-2 py-0.5 border border-border rounded-[8px]">cached</span>
+                <span className="text-[11px] text-text3 px-2 py-0.5 border border-border rounded-lg">cached</span>
               )}
             </div>
             <p className="text-[14px] text-text2 leading-relaxed">{result.summary}</p>
@@ -375,12 +375,12 @@ export default function FinancialsPage() {
               <h3 className="section-title">🏁 12-Month Milestones</h3>
               <div className="relative">
                 {/* Timeline line */}
-                <div className="absolute left-[19px] top-0 bottom-0 w-[2px] bg-border" />
+                <div className="absolute left-4.75 top-0 bottom-0 w-0.5 bg-border" />
                 <div className="flex flex-col gap-0">
                   {result.milestones.map((m, i) => (
                     <div key={i} className="flex items-start gap-4 pb-6 relative">
                       {/* Dot */}
-                      <div className="w-10 h-10 rounded-full bg-accent/10 border-2 border-accent flex items-center justify-center text-[12px] font-bold text-accent shrink-0 z-10 bg-bg2">
+                      <div className="w-10 h-10 rounded-full bg-accent/10 border-2 border-accent flex items-center justify-center text-[12px] font-bold text-accent shrink-0 z-10">
                         M{m.month}
                       </div>
                       {/* Content */}
@@ -401,7 +401,7 @@ export default function FinancialsPage() {
               <h3 className="section-title">⚠️ Financial Risks</h3>
               <div className="flex flex-col gap-3">
                 {result.risks.map((r, i) => (
-                  <div key={i} className="flex items-start gap-3 p-4 bg-danger/5 border border-danger/15 rounded-[12px]">
+                  <div key={i} className="flex items-start gap-3 p-4 bg-danger/5 border border-danger/15 rounded-xl">
                     <span className="w-6 h-6 rounded-full bg-danger/15 text-danger text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5">
                       {i + 1}
                     </span>

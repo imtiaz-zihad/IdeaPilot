@@ -59,7 +59,7 @@ export default function ValidatorPage() {
       {/* Controls */}
       <div className="card mb-6">
         <div className="flex gap-3 items-end flex-wrap">
-          <div className="flex-1 min-w-[200px]">
+          <div className="flex-1 min-w-50">
             <label className="label">Select startup to validate</label>
             {fetching ? <div className="input text-text3">Loading...</div>
               : startups.length === 0 ? <div className="input text-text3">No startups yet</div>
@@ -92,8 +92,8 @@ export default function ValidatorPage() {
         <div className="flex flex-col gap-4">
           {/* Overall score */}
           <div className="card flex gap-6 items-center flex-wrap">
-            <div className="relative w-[120px] h-[120px] flex-shrink-0">
-              <svg width="120" height="120" viewBox="0 0 120 120" className="rotate-[-90deg]">
+            <div className="relative w-30 h-30 shrink-0">
+              <svg width="120" height="120" viewBox="0 0 120 120" className="-rotate-90">
                 <circle cx="60" cy="60" r="50" fill="none" stroke="var(--bg4)" strokeWidth="10"/>
                 <circle cx="60" cy="60" r="50" fill="none" stroke={scoreColor(result.overallScore)}
                   strokeWidth="10" strokeLinecap="round" strokeDasharray="314"
@@ -111,7 +111,7 @@ export default function ValidatorPage() {
                   style={{ background: `${scoreColor(result.overallScore)}18`, borderColor: `${scoreColor(result.overallScore)}40` }}>
                   {result.overallScore}/100
                 </span>
-                {cached && <span className="text-[11px] text-text3 px-2 py-0.5 border border-border rounded-[8px]">cached</span>}
+                {cached && <span className="text-[11px] text-text3 px-2 py-0.5 border border-border rounded-lg">cached</span>}
               </div>
               <p className="text-[14px] text-text2 leading-relaxed">{result.recommendation}</p>
             </div>
@@ -158,12 +158,12 @@ export default function ValidatorPage() {
               { title:"⚠️ Weaknesses",    items:result.weaknesses,    color:"var(--red)",   cls:"bg-danger/5 border-danger/20" },
               { title:"🌟 Opportunities", items:result.opportunities, color:"var(--amber)", cls:"bg-warning/5 border-warning/20" },
             ].map(c => (
-              <div key={c.title} className={`rounded-[12px] border p-4 ${c.cls}`}>
+              <div key={c.title} className={`rounded-xl border p-4 ${c.cls}`}>
                 <div className="text-[13px] font-semibold mb-3" style={{ color: c.color }}>{c.title}</div>
                 <ul className="flex flex-col gap-2">
                   {(c.items||[]).map((item, i) => (
                     <li key={i} className="flex gap-2 text-[12px] text-text2 leading-relaxed">
-                      <span style={{ color: c.color }} className="flex-shrink-0 mt-0.5">→</span>{item}
+                      <span style={{ color: c.color }} className="shrink-0 mt-0.5">→</span>{item}
                     </li>
                   ))}
                 </ul>

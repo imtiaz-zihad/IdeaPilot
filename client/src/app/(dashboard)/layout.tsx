@@ -24,10 +24,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         setStatus("fail");
       }
     })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     if (status === "fail") router.push("/login");
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status]);
 
   /* Loading */

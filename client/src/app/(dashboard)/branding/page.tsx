@@ -69,7 +69,7 @@ export default function BrandingPage() {
       {/* Controls */}
       <div className="card mb-6">
         <div className="flex gap-3 items-end flex-wrap">
-          <div className="flex-1 min-w-[200px]">
+          <div className="flex-1 min-w-50">
             <label className="label">Select startup</label>
             {fetching ? <div className="input text-text3">Loading...</div>
               : startups.length === 0 ? <div className="input text-text3">No startups yet</div>
@@ -115,8 +115,8 @@ export default function BrandingPage() {
               <div className="text-[14px] font-semibold mb-3">⚡ Brand Personality</div>
               <div className="flex flex-col gap-2">
                 {(result.brandPersonality || []).map((trait, i) => (
-                  <div key={i} className="flex items-center gap-2.5 px-3 py-2 bg-bg3 rounded-[8px]">
-                    <span className="w-1.5 h-1.5 rounded-full bg-accent flex-shrink-0" />
+                  <div key={i} className="flex items-center gap-2.5 px-3 py-2 bg-bg3 rounded-lg">
+                    <span className="w-1.5 h-1.5 rounded-full bg-accent shrink-0" />
                     <span className="text-[13px] font-medium">{trait}</span>
                   </div>
                 ))}
@@ -128,12 +128,12 @@ export default function BrandingPage() {
           <div className="card">
             <div className="flex items-center justify-between mb-4">
               <div className="text-[14px] font-semibold">✏️ Brand Names</div>
-              {cached && <span className="text-[11px] text-text3 px-2 py-0.5 border border-border rounded-[8px]">cached</span>}
+              {cached && <span className="text-[11px] text-text3 px-2 py-0.5 border border-border rounded-lg">cached</span>}
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {(result.brandNames || []).map((b, i) => (
-                <div key={i} className={`bg-bg3 rounded-[12px] p-4 relative border ${i === 0 ? "border-l-4 border-accent" : "border-border"}`}>
-                  {i === 0 && <span className="absolute top-2.5 right-2.5 text-[10px] px-2 py-0.5 rounded-[6px] bg-accent text-white">Top Pick</span>}
+                <div key={i} className={`bg-bg3 rounded-xl p-4 relative border ${i === 0 ? "border-l-4 border-accent" : "border-border"}`}>
+                  {i === 0 && <span className="absolute top-2.5 right-2.5 text-[10px] px-2 py-0.5 rounded-md bg-accent text-white">Top Pick</span>}
                   <div className={`text-[18px] font-bold mb-1 ${i === 0 ? "text-accent" : "text-text"}`}>{b.name}</div>
                   <div className="text-[11px] text-text3 mb-2">{b.domain}</div>
                   <p className="text-[12px] text-text2 leading-relaxed mb-3">{b.reasoning}</p>
@@ -161,11 +161,11 @@ export default function BrandingPage() {
               {(result.slogans || []).map((s, i) => (
                 <div key={i} className="flex items-center justify-between gap-3 px-4 py-3 bg-bg3 rounded-[10px]">
                   <div className="flex items-center gap-3 flex-1">
-                    <span className={`badge border flex-shrink-0 ${toneColor[s.tone] || "text-accent bg-accent/10 border-accent/20"}`}>{s.tone}</span>
+                    <span className={`badge border shrink-0 ${toneColor[s.tone] || "text-accent bg-accent/10 border-accent/20"}`}>{s.tone}</span>
                     <span className="text-[14px] italic">&quot;{s.text}&quot;</span>
                   </div>
                   <button onClick={() => copy(s.text, `slogan-${i}`)}
-                    className={`text-[12px] bg-transparent border-none cursor-pointer flex-shrink-0 ${copied === `slogan-${i}` ? "text-success" : "text-text3 hover:text-text2"}`}>
+                    className={`text-[12px] bg-transparent border-none cursor-pointer shrink-0 ${copied === `slogan-${i}` ? "text-success" : "text-text3 hover:text-text2"}`}>
                     {copied === `slogan-${i}` ? "✓" : "copy"}
                   </button>
                 </div>
@@ -228,7 +228,7 @@ export default function BrandingPage() {
             <div className="text-[14px] font-semibold mb-4">🖼️ Logo Concepts</div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {(result.logoConcepts || []).map((l, i) => (
-                <div key={i} className="bg-bg3 border border-border rounded-[12px] p-5 text-center">
+                <div key={i} className="bg-bg3 border border-border rounded-xl p-5 text-center">
                   <div className="text-[52px] mb-3">{l.icon}</div>
                   <span className="badge-accent text-[11px] mb-3 inline-block">{l.style}</span>
                   <p className="text-[12px] text-text2 leading-relaxed mt-2">{l.description}</p>

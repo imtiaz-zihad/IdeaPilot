@@ -19,10 +19,11 @@ function scoreClass(s: number) {
 }
 
 const QUICK = [
-  { icon:"🎯", label:"Validate Idea",  href:"/validator",  border:"#6c63ff" },
-  { icon:"🎨", label:"Build Brand",    href:"/branding",   border:"#ec4899" },
-  { icon:"🖥️", label:"Pitch Deck",     href:"/pitch",      border:"#3b82f6" },
-  { icon:"💰", label:"Financials",     href:"/financials", border:"#22c55e" },
+  { icon: "🎯", label: "Validate Idea",    href: "/validator",        border: "#6c63ff" },
+  { icon: "🎨", label: "Build Brand",      href: "/branding",         border: "#ec4899" },
+  { icon: "🖥️", label: "Pitch Deck",       href: "/pitch",            border: "#3b82f6" },
+  { icon: "💰", label: "Financials",       href: "/financials",       border: "#22c55e" },
+  { icon: "📊", label: "Market Research",  href: "/market-research",  border: "#f59e0b" },
 ];
 
 export default function DashboardPage() {
@@ -99,7 +100,7 @@ export default function DashboardPage() {
               <div
                 key={s._id}
                 onClick={() => router.push(`/startups/${s._id}`)}
-                className={`flex items-center gap-3.5 py-3 cursor-pointer hover:bg-bg3 -mx-5 px-5 transition-colors duration-150 rounded-[8px]
+                className={`flex items-center gap-3.5 py-3 cursor-pointer hover:bg-bg3 -mx-5 px-5 transition-colors duration-150 rounded-lg
                   ${i < Math.min(startups.length, 5) - 1 ? "border-b border-border" : ""}`}
               >
                 {/* Emoji icon */}

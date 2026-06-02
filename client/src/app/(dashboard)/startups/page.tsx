@@ -55,7 +55,7 @@ export default function StartupsPage() {
 
       {/* Search + Filter */}
       <div className="flex gap-2.5 mb-5 flex-wrap">
-        <div className="relative flex-1 min-w-[200px]">
+        <div className="relative flex-1 min-w-50">
           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text3 text-[14px]">🔍</span>
           <input className="input pl-8" placeholder="Search startups..."
             value={search} onChange={e => setSearch(e.target.value)} />
@@ -63,7 +63,7 @@ export default function StartupsPage() {
         <div className="flex gap-1.5 flex-wrap">
           {["all","idea","mvp","growth","scale"].map(f => (
             <button key={f} onClick={() => setFilter(f)}
-              className={`px-3.5 py-2 rounded-[8px] text-[12px] font-medium cursor-pointer border capitalize transition-all
+              className={`px-3.5 py-2 rounded-lg text-[12px] font-medium cursor-pointer border capitalize transition-all
                 ${filter === f ? "bg-accent text-white border-accent" : "bg-bg2 text-text2 border-border hover:bg-bg3"}`}>
               {f}
             </button>
@@ -98,7 +98,7 @@ function StartupCard({ startup: s, onClick }: { startup: Startup; onClick: () =>
       {/* Top */}
       <div className="flex items-start justify-between mb-3.5">
         <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-[12px] bg-bg3 flex items-center justify-center text-[22px] flex-shrink-0">
+          <div className="w-11 h-11 rounded-xl bg-bg3 flex items-center justify-center text-[22px] shrink-0">
             {industryEmoji[s.industry] || "💡"}
           </div>
           <div>
@@ -115,7 +115,7 @@ function StartupCard({ startup: s, onClick }: { startup: Startup; onClick: () =>
       {/* Meta */}
       <div className="flex gap-1.5 flex-wrap mb-4">
         <span className="meta-tag">📍 {s.country}</span>
-        <span className="meta-tag truncate max-w-[140px]">👥 {s.targetAudience}</span>
+        <span className="meta-tag truncate max-w-35">👥 {s.targetAudience}</span>
       </div>
 
       {/* Score bar */}
@@ -126,7 +126,7 @@ function StartupCard({ startup: s, onClick }: { startup: Startup; onClick: () =>
             {s.investorScore ? `${s.investorScore}/100` : "Not validated"}
           </span>
         </div>
-        <div className="h-[5px] bg-bg4 rounded-full overflow-hidden">
+        <div className="h-1.25 bg-bg4 rounded-full overflow-hidden">
           <div className="h-full rounded-full transition-all duration-700"
             style={{ width: `${s.investorScore || 0}%`, background: s.investorScore ? scoreColor(s.investorScore) : "var(--bg4)" }} />
         </div>
@@ -146,11 +146,11 @@ function StartupCard({ startup: s, onClick }: { startup: Startup; onClick: () =>
 function SkeletonCard() {
   return (
     <div className="card flex flex-col gap-3">
-      <div className="skeleton h-11 w-11 rounded-[12px]" />
+      <div className="skeleton h-11 w-11 rounded-xl" />
       <div className="skeleton h-4 w-3/4" />
       <div className="skeleton h-3 w-full" />
       <div className="skeleton h-3 w-2/3" />
-      <div className="skeleton h-[5px] w-full mt-2" />
+      <div className="skeleton h-1.25 w-full mt-2" />
     </div>
   );
 }

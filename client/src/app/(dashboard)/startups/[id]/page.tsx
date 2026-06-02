@@ -77,7 +77,7 @@ export default function StartupDetailPage() {
       {/* Hero */}
       <div className="card mb-5">
         <div className="flex items-start gap-4 flex-wrap">
-          <div className="w-16 h-16 rounded-[14px] bg-bg3 flex items-center justify-center text-[30px] flex-shrink-0">{emoji}</div>
+          <div className="w-16 h-16 rounded-[14px] bg-bg3 flex items-center justify-center text-[30px] shrink-0">{emoji}</div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2.5 flex-wrap mb-1.5">
               <h1 className="text-[22px] font-bold font-head">{s.startupName}</h1>
@@ -93,9 +93,9 @@ export default function StartupDetailPage() {
 
           {/* Score ring */}
           {score && (
-            <div className="text-center flex-shrink-0">
-              <div className="relative w-[90px] h-[90px]">
-                <svg width="90" height="90" viewBox="0 0 90 90" className="rotate-[-90deg]">
+            <div className="text-center shrink-0">
+              <div className="relative w-22.5 h-22.5">
+                <svg width="90" height="90" viewBox="0 0 90 90" className="-rotate-90">
                   <circle cx="45" cy="45" r="36" fill="none" stroke="var(--bg4)" strokeWidth="7"/>
                   <circle cx="45" cy="45" r="36" fill="none" stroke={scoreColor(score)}
                     strokeWidth="7" strokeLinecap="round" strokeDasharray="226"
@@ -116,7 +116,7 @@ export default function StartupDetailPage() {
           <span className="text-[12px] text-text2 mr-1">Stage:</span>
           {stageOptions.map(stage => (
             <button key={stage} onClick={() => handleStageUpdate(stage)} disabled={updatingStage}
-              className={`px-3 py-1.5 rounded-[8px] text-[12px] border capitalize cursor-pointer transition-all
+              className={`px-3 py-1.5 rounded-lg text-[12px] border capitalize cursor-pointer transition-all
                 ${s.stage === stage ? "bg-accent text-white border-accent font-semibold" : "bg-bg3 text-text2 border-border hover:bg-bg4"}`}>
               {stage}
             </button>
@@ -246,8 +246,8 @@ function ValidationView({ result, createdAt }: { result: any; createdAt: string 
     <div className="flex flex-col gap-3.5">
       {/* Score */}
       <div className="card flex gap-5 flex-wrap items-center">
-        <div className="relative w-[90px] h-[90px] flex-shrink-0">
-          <svg width="90" height="90" viewBox="0 0 90 90" className="rotate-[-90deg]">
+        <div className="relative w-22.5 h-22.5 shrink-0">
+          <svg width="90" height="90" viewBox="0 0 90 90" className="-rotate-90">
             <circle cx="45" cy="45" r="36" fill="none" stroke="var(--bg4)" strokeWidth="7"/>
             <circle cx="45" cy="45" r="36" fill="none" stroke={scoreColor(sc)}
               strokeWidth="7" strokeLinecap="round" strokeDasharray="226"
@@ -285,7 +285,7 @@ function ValidationView({ result, createdAt }: { result: any; createdAt: string 
               <div className="h-1 bg-bg4 rounded-full mb-2 overflow-hidden">
                 <div className="h-full rounded-full" style={{ width: `${dim.score}%`, background: c }} />
               </div>
-              <span className={`text-[11px] px-2 py-0.5 rounded-[6px] ${ct}`}
+              <span className={`text-[11px] px-2 py-0.5 rounded-md ${ct}`}
                 style={{ background: `${c}18` }}>{dim.label}</span>
               <p className="text-[12px] text-text2 leading-relaxed mt-2">{dim.summary}</p>
             </div>
@@ -300,12 +300,12 @@ function ValidationView({ result, createdAt }: { result: any; createdAt: string 
           { title:"⚠️ Weaknesses",    items:result.weaknesses,    color:"var(--red)",   bg:"bg-danger/5 border-danger/15" },
           { title:"🌟 Opportunities", items:result.opportunities, color:"var(--amber)", bg:"bg-warning/5 border-warning/15" },
         ].map(c => (
-          <div key={c.title} className={`rounded-[12px] border p-4 ${c.bg}`}>
+          <div key={c.title} className={`rounded-xl border p-4 ${c.bg}`}>
             <div className="text-[13px] font-semibold mb-3" style={{ color: c.color }}>{c.title}</div>
             <ul className="flex flex-col gap-2">
               {(c.items||[]).map((item: string, i: number) => (
                 <li key={i} className="flex gap-2 text-[12px] text-text2 leading-relaxed">
-                  <span style={{ color: c.color }} className="flex-shrink-0">→</span>{item}
+                  <span style={{ color: c.color }} className="shrink-0">→</span>{item}
                 </li>
               ))}
             </ul>
@@ -319,7 +319,7 @@ function ValidationView({ result, createdAt }: { result: any; createdAt: string 
 function LoadingSkeleton() {
   return (
     <div className="max-w-4xl mx-auto flex flex-col gap-3.5">
-      <div className="skeleton h-[160px] w-full" />
+      <div className="skeleton h-40 w-full" />
       <div className="skeleton h-10 w-1/2" />
       <div className="grid grid-cols-3 gap-3">
         {[1,2,3].map(i => <div key={i} className="skeleton h-24" />)}

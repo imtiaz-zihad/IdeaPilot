@@ -107,7 +107,7 @@ export default function MarketResearchPage() {
       {/* ── Controls ── */}
       <div className="card mb-6">
         <div className="flex gap-3 items-end flex-wrap">
-          <div className="flex-1 min-w-[200px]">
+          <div className="flex-1 min-w-50">
             <label className="label">Select startup</label>
             {fetching ? (
               <div className="input text-text3 pointer-events-none">Loading...</div>
@@ -172,7 +172,7 @@ export default function MarketResearchPage() {
               <div className="flex items-center gap-2.5 mb-2">
                 <span className="text-[15px] font-semibold text-text">Market Summary</span>
                 {cached && (
-                  <span className="text-[11px] text-text3 px-2 py-0.5 border border-border rounded-[8px]">
+                  <span className="text-[11px] text-text3 px-2 py-0.5 border border-border rounded-lg">
                     cached
                   </span>
                 )}
