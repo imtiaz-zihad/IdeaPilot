@@ -17,6 +17,7 @@ import pitchDeckRoutes from "./routes/pitchdeck.routes";
 import marketRoutes from "./routes/market.routes";
 import financialRoutes from "./routes/financial.router";
 import businessPlanRoutes from "./routes/businessplan.router";
+import chatRoutes from "./routes/chat.routes";
 
 const app = express();
 
@@ -43,6 +44,8 @@ app.use("/api/startups", pitchDeckRoutes);
 app.use("/api/startups", marketRoutes);
 app.use("/api/startups", financialRoutes);
 app.use("/api/startups", businessPlanRoutes);
+
+app.use("/api/chat", chatRoutes);
 
 // Error handlers
 app.use(notFound);
