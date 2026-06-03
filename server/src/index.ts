@@ -16,6 +16,7 @@ import brandingRoutes from "./routes/branding.routes";
 import pitchDeckRoutes from "./routes/pitchdeck.routes";
 import marketRoutes from "./routes/market.routes";
 import financialRoutes from "./routes/financial.router";
+import businessPlanRoutes from "./routes/businessplan.router";
 
 const app = express();
 
@@ -36,12 +37,12 @@ app.get("/", (req, res) => {
 });
 app.use("/api/auth",     authRoutes);
 app.use("/api/startups", startupRoutes);
-app.use("/api/startups", validatorRoutes); // mounts as /api/startups/:id/validate
+app.use("/api/startups", validatorRoutes); 
 app.use("/api/startups", brandingRoutes);
 app.use("/api/startups", pitchDeckRoutes);
-
 app.use("/api/startups", marketRoutes);
 app.use("/api/startups", financialRoutes);
+app.use("/api/startups", businessPlanRoutes);
 
 // Error handlers
 app.use(notFound);
