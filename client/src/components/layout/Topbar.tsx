@@ -13,6 +13,7 @@ const titles: Record<string, string> = {
   "/branding":   "Branding Assistant",
   "/pitch":      "Pitch Deck",
   "/settings":   "Settings",
+  "/business-plan": "Business Plan Generator",
 };
 
 export default function Topbar() {
